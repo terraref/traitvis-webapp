@@ -52,9 +52,10 @@ shiny::runGitHub(repo = 'reference-data',
 
 ## Docker Notes
 
-
+```sh
 docker build -t shiny-traits .
 ## enter bash as root to setup
 docker run --rm -t -i shiny-traits /bin/bash
 ## after deploying app, launch so it can be accessed by browser at localhost:3838
 docker run --rm -t -i -p 3838:3838 shiny-traits
+```
