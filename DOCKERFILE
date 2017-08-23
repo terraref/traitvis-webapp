@@ -1,0 +1,3 @@
+FROM rocker/shiny
+
+RUN apt-get update && apt-get -y install libgeos-dev libpq-dev
