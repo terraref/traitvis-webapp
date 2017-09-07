@@ -6,4 +6,15 @@ RUN apt-get update -qq \
          && apt-get -y install --no-install-recommends \
          cron \
          libgeos-dev \
-         libpq-dev 
+         libpq-dev \
+      && install2.r --error \
+         cronR \
+         dplyr \
+         ggplot2 \
+         leaflet \
+         lubridate \
+         shiny \
+         shinythemes \
+         rgeos \
+         RPostgreSQL \
+         timevis
