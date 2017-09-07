@@ -1,3 +1,9 @@
 FROM rocker/shiny
 
-RUN apt-get update && apt-get -y install libgeos-dev libpq-dev cron
+MAINTAINER "Nicholas Heyek and David LeBauer"
+
+RUN apt-get update -qq \
+         && apt-get -y install --no-install-recommends \
+         cron \
+         libgeos-dev \
+         libpq-dev 
