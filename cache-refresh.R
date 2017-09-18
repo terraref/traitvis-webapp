@@ -50,8 +50,9 @@ get_data_for_season <- function(season) {
     rename(site_id = id)
   
   cultivars_table <- tbl(bety_src, 'cultivars') %>%
-    rename(cultivar_id = id, cultivar_name = name) %>%
-    select(cultivar_id, cultivar_name)
+    rename(cultivar_id = id) %>% 
+    rename(cultivar_name = name) %>%
+    select(cultivar_id, cultivar_name) 
   
   traits <- traits_table %>% 
     left_join(sites_table, by = 'site_id') %>%
