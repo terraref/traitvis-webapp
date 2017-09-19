@@ -18,3 +18,5 @@ RUN apt-get update -qq \
          rgeos \
          RPostgreSQL \
          timevis
+
+COPY . /srv/shiny-server/
