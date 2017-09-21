@@ -23,6 +23,7 @@ RUN apt-get update -qq \
          shinythemes \
          rgeos \
          RPostgreSQL \
-         timevis
-
+         timevis \
+      && rm -rf /srv/shiny-server/sample-apps
+      
 COPY . /srv/shiny-server/
