@@ -4,19 +4,13 @@ library(lubridate)
 options(scipen=999)
 
 # set up remote connection to BETYdb
-# bety_src <- src_postgres(
-#   dbname = Sys.getenv('bety_dbname'),
-#   password = Sys.getenv('bety_password'),
-#   host = Sys.getenv('bety_host'),
-#   port = Sys.getenv('bety_port'),
-#   user = Sys.getenv('bety_user')
-# )
-bety_src <- src_postgres(dbname = "bety", 
-                         password = 'bety', 
-                         #host = 'terra-bety.default', 
-                         host = 'localhost', 
-                         user = 'bety', 
-                         port = 5432)
+bety_src <- src_postgres(
+  dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
+  password = ifelse(Sys.getenv('bety_password') == '', 'bety', Sys.getenv('bety_password')),
+  host     = ifelse(Sys.getenv('bety_host')     == '', 'localhost', Sys.getenv('bety_host')),
+  port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
+  user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
+)
 
 # get all relevant data from BETYdb for a given season, write to cache file
 get_data_for_season <- function(season) {
