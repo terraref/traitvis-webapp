@@ -20,7 +20,7 @@ bety_user=bety
 
 There are three methods that you can use access to the TERRAREF instance of BETYdb:
 
-1. If running on the NCSA Nebula cluster within the terraref domain, can be accessed by setting the environment variable `betydb_host=bety6`
+1. If running on the NCSA Nebula cluster within the terraref domain, can be accessed by setting the environment variable `bety_host=bety6`
     1. This can be done within the NDS Workbench at terraref.ndslabs.org
 2. Otherwise, use an ssh tunnel. Developers can get ssh access to the TERRA REF database server, you can [request here](https://identity.ncsa.illinois.edu/join/TU49BUUEDM) and the connect with
     ```sh
