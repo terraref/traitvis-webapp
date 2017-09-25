@@ -15,6 +15,7 @@ RUN apt-get update -qq \
          libpq-dev \
       && install2.r --error \
          cronR \
+         dbplyr \
          dplyr \
          ggplot2 \
          leaflet \
