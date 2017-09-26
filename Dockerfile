@@ -28,3 +28,4 @@ RUN apt-get update -qq \
       && rm -rf /srv/shiny-server/sample-apps
       
 COPY . /srv/shiny-server/
+COPY shiny-server.conf /etc/shiny-server/
