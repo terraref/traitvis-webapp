@@ -29,3 +29,6 @@ RUN apt-get update -qq \
       
 COPY . /srv/shiny-server/
 COPY shiny-server.conf /etc/shiny-server/
+RUN chown -R shiny:shiny /srv/shiny-server && \
+    chown -R shiny:shiny /var/lib/shiny-server
+USER shiny
