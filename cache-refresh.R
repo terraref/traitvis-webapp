@@ -7,7 +7,7 @@ options(scipen=999)
 bety_src <- src_postgres(
   dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
   password = ifelse(Sys.getenv('bety_password') == '', 'bety', Sys.getenv('bety_password')),
-  host     = ifelse(Sys.getenv('bety_host')     == '', 'bety6', Sys.getenv('bety_host')),
+  host     = ifelse(Sys.getenv('bety_host')     == '', 'bety6.ncsa.illinois.edu', Sys.getenv('bety_host')),
   port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
   user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
 )
