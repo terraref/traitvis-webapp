@@ -63,6 +63,17 @@ This is the manual version of what is automated using Docker.
 #### Dependencies
 
 
+#### System Programs 
+
+cron (Ubuntu)
+
+```sh
+apt-get update
+apt-get install cron
+```
+
+Shiny server: see https://www.rstudio.com/products/shiny/download-server/
+
 #### R packages
 
 - shiny
@@ -79,17 +90,6 @@ This is the manual version of what is automated using Docker.
 lapply(list('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR'),
        install.packages)
 ```
-
-#### System Programs 
-
-cron (Ubuntu)
-
-```sh
-apt-get update
-apt-get install cron
-```
-
-Shiny server: see https://www.rstudio.com/products/shiny/download-server/
 
 #### Deploy
 

@@ -1,15 +1,15 @@
 library(dplyr)
 library(tools)
 library(lubridate)
-options(scipen=999)
+options(scipen = 999)
 
 # set up remote connection to BETYdb
 bety_src <- src_postgres(
   dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
-  password = ifelse(Sys.getenv('bety_password') == '', 'bety', Sys.getenv('bety_password')),
+  password = ifelse(Sys.getenv('bety_password') == '', 'DelchevskoOro', Sys.getenv('bety_password')),
   host     = ifelse(Sys.getenv('bety_host')     == '', 'bety6.ncsa.illinois.edu', Sys.getenv('bety_host')),
   port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
-  user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
+  user     = ifelse(Sys.getenv('bety_user')     == '', 'viewer', Sys.getenv('bety_user'))
 )
 
 # get all relevant data from BETYdb for a given season, write to cache file
