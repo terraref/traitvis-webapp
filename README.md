@@ -34,11 +34,11 @@ This application requires a connection to a BETYdb database. It requires a BETYd
 Connection parameters can be set as environment variables. By default they are:
 
 ```
-bety_dbname=bety
-bety_password=bety
-bety_host=localhost
-bety_port=5432
-bety_user=bety
+bety_dbname   = bety
+bety_password = SECRET
+bety_host     = bety6.ncsa.illinois.edu
+bety_port     = 5432
+bety_user     = viewer
 ```
 
 There are three methods that you can use access to the TERRAREF instance of BETYdb:
@@ -63,6 +63,17 @@ This is the manual version of what is automated using Docker.
 #### Dependencies
 
 
+#### System Programs 
+
+cron (Ubuntu)
+
+```sh
+apt-get update
+apt-get install cron
+```
+
+Shiny server: see https://www.rstudio.com/products/shiny/download-server/
+
 #### R packages
 
 - shiny
@@ -79,17 +90,6 @@ This is the manual version of what is automated using Docker.
 lapply(list('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR'),
        install.packages)
 ```
-
-#### System Programs 
-
-cron (Ubuntu)
-
-```sh
-apt-get update
-apt-get install cron
-```
-
-Shiny server: see https://www.rstudio.com/products/shiny/download-server/
 
 #### Deploy
 
