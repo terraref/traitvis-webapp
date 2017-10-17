@@ -34,11 +34,11 @@ This application requires a connection to a BETYdb database. It requires a BETYd
 Connection parameters can be set as environment variables. By default they are:
 
 ```
-bety_dbname=bety
-bety_password=bety
-bety_host=localhost
-bety_port=5432
-bety_user=bety
+bety_dbname   = bety
+bety_password = SECRET
+bety_host     = bety6.ncsa.illinois.edu
+bety_port     = 5432
+bety_user     = viewer
 ```
 
 There are three methods that you can use access to the TERRAREF instance of BETYdb:
