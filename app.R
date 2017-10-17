@@ -62,7 +62,7 @@ render_subexp_ui <- function(subexp_name) {
   )
 }
 
-render_experiment_ui <- function(exp_name) {
+render_experiment_ui <- function(exp_name, full_cache_data) {
   
   subexp_tabs <- lapply(names(full_cache_data[[ exp_name ]]), render_subexp_ui)
   
@@ -297,7 +297,7 @@ server <- function(input, output) {
   
   # render UI for all available experiments
   output$page_content <- renderUI({
-    subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui)
+    subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)
     do.call(tabsetPanel, subexp_tabs)
   })
   
