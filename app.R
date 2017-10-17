@@ -27,33 +27,34 @@ ui <- fluidPage(theme = shinytheme('flatly'),
   uiOutput('page_content')
 )
 
-# render UI for a given season
-render_season_ui <- function(season_name) {
+# render UI for a given subexperiment
+render_subexp_ui <- function(subexp_name) {
   
-  tabPanel(season_name,
+  tabPanel(subexp_name,
     
     sidebarPanel(class = 'push-down',
-      uiOutput(paste0('variable_select_', season_name)),
-      uiOutput(paste0('cultivar_select_', season_name))
+      uiOutput(paste0('variable_select_', subexp_name)),
+      uiOutput(paste0('cultivar_select_', subexp_name))
     ),
      
-    uiOutput(paste0(paste0('plot_hover_info_', season_name))),
+    uiOutput(paste0(paste0('plot_hover_info_', subexp_name))),
     
     mainPanel(class = 'main-panel',
+    
     tabsetPanel(
         tabPanel('Plot',
           div(class = 'push-down',
-            plotOutput(paste0('trait_plot_', season_name), 
-                        hover = hoverOpts(id = paste0('plot_hover_', season_name)))
+            plotOutput(paste0('trait_plot_', subexp_name), 
+                        hover = hoverOpts(id = paste0('plot_hover_', subexp_name)))
           ),
           hr(),
-          uiOutput(paste0('mgmt_select_info_', season_name)),
-          timevisOutput(paste0('mgmt_timeline_', season_name))
+          uiOutput(paste0('mgmt_select_info_', subexp_name)),
+          timevisOutput(paste0('mgmt_timeline_', subexp_name))
         ),
         tabPanel('Map',
           div(class = 'map-container push-out',
-            uiOutput(paste0('map_date_slider_', season_name)),
-            leafletOutput(paste0('site_map_', season_name), width = '600px', height = '600px')
+            uiOutput(paste0('map_date_slider_', subexp_name)),
+            leafletOutput(paste0('site_map_', subexp_name), width = '600px', height = '600px')
           )
         )
       )
@@ -61,47 +62,56 @@ render_season_ui <- function(season_name) {
   )
 }
 
-# render selection menu from available variables in a given season
-render_variable_menu <- function(season_name, output, full_cache_data) {
+render_experiment_ui <- function(exp_name, full_cache_data) {
   
-  variable_names <- names(full_cache_data[[ season_name ]][[ 'trait_data' ]])
+  subexp_tabs <- lapply(names(full_cache_data[[ exp_name ]]), render_subexp_ui)
   
-  output[[ paste0('variable_select_', season_name) ]] <- renderUI({
-    selectInput(paste0('selected_variable_', season_name), 'Variable', variable_names)
+  do.call(tabPanel, list(exp_name, div(class = 'push-down'),
+    do.call(tabsetPanel, subexp_tabs))
+  )
+}
+
+# render selection menu from available variables in a given subexperiment
+render_variable_menu <- function(subexp_name, output, full_cache_data) {
+  
+  variable_names <- names(full_cache_data[[ subexp_name ]][[ 'trait_data' ]])
+  
+  output[[ paste0('variable_select_', subexp_name) ]] <- renderUI({
+    selectInput(paste0('selected_variable_', subexp_name), 'Variable', variable_names)
   })
 }
 
-# render selection menu from available cultivars in a given season, for the selected variable
-render_cultivar_menu <- function(season_name, input, output, full_cache_data) {
+# render selection menu from available cultivars in a given subexperiment, for the selected variable
+render_cultivar_menu <- function(subexp_name, input, output, full_cache_data) {
   
-  output[[ paste0('cultivar_select_', season_name) ]] <- renderUI({
+  output[[ paste0('cultivar_select_', subexp_name) ]] <- renderUI({
     
-    req(input[[ paste0('selected_variable_', season_name) ]])
+    req(input[[ paste0('selected_variable_', subexp_name) ]])
     
-    trait_records <- full_cache_data[[ season_name ]][[ 'trait_data' ]][[ input[[ paste0('selected_variable_', season_name) ]] ]][[ 'traits' ]]
+    trait_records <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ input[[ paste0('selected_variable_', subexp_name) ]] ]][[ 'traits' ]]
     unique_cultivars <- unique(trait_records[[ 'cultivar_name' ]])
     
-    selectInput(paste0('selected_cultivar_', season_name), 'Cultivar', c('None', unique_cultivars))
+    selectInput(paste0('selected_cultivar_', subexp_name), 'Cultivar', c('None', unique_cultivars))
   })
 }
 
-# render box plot time series from trait records in a given season, for the selected variable
+# render box plot time series from trait records in a given subexperiment, for the selected variable
 # if a cultivar is selected, render line plot from trait records for that cultivar
-render_trait_plot <- function(season_name, input, output, full_cache_data) {
+render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
   
-  output[[ paste0('trait_plot_', season_name) ]] <- renderPlot({
+  output[[ paste0('trait_plot_', subexp_name) ]] <- renderPlot({
     
-    req(input[[ paste0('selected_variable_', season_name) ]])
-    req(input[[ paste0('selected_cultivar_', season_name) ]])
+    req(input[[ paste0('selected_variable_', subexp_name) ]])
+    req(input[[ paste0('selected_cultivar_', subexp_name) ]])
     
-    selected_season_data <- full_cache_data[[ season_name ]]
-    selected_variable <- input[[ paste0('selected_variable_', season_name) ]]
-    selected_cultivar <- input[[ paste0('selected_cultivar_', season_name) ]]
+    selected_subexp_data <- full_cache_data[[ subexp_name ]]
+    selected_variable <- input[[ paste0('selected_variable_', subexp_name) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', subexp_name) ]]
     
-    plot_data <- selected_season_data[[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    plot_data <- selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     data_max <- max(plot_data[[ 'mean' ]])
     
-    units <- selected_season_data[[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
+    units <- selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
     title <- ifelse(units == '', selected_variable, paste0(selected_variable, ' (', units, ')'))
     
     trait_plot <- ggplot() + 
@@ -133,17 +143,17 @@ render_trait_plot <- function(season_name, input, output, full_cache_data) {
       ) +
       theme_bw() + 
       theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none") +
-      xlim(as.Date(selected_season_data[[ 'start_date' ]]), as.Date(selected_season_data[[ 'end_date' ]])) +
+      xlim(as.Date(selected_subexp_data[[ 'start_date' ]]), as.Date(selected_subexp_data[[ 'end_date' ]])) +
       ylim(0, data_max)
   })
 }
 
-# render timeline from management records in a given season
-render_mgmt_timeline <- function(season_name, input, output, full_cache_data) {
+# render timeline from management records in a given subexperiment
+render_mgmt_timeline <- function(subexp_name, input, output, full_cache_data) {
   
-  output[[ paste0('mgmt_timeline_', season_name) ]] <- renderTimevis({
+  output[[ paste0('mgmt_timeline_', subexp_name) ]] <- renderTimevis({
     
-    management_data <- full_cache_data[[ season_name ]][[ 'managements' ]]
+    management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
     
     if (nrow(management_data) > 0) {
       
@@ -165,13 +175,13 @@ render_mgmt_timeline <- function(season_name, input, output, full_cache_data) {
 }
 
 # render info box for date and value of cursor when hovering box/line plot
-render_plot_hover <- function(season_name, input, output, full_cache_data) {
+render_plot_hover <- function(subexp_name, input, output, full_cache_data) {
   
-  output[[ paste0('plot_hover_info_', season_name) ]] <- renderUI({
+  output[[ paste0('plot_hover_info_', subexp_name) ]] <- renderUI({
     
-    req(input[[ paste0('plot_hover_', season_name) ]])
+    req(input[[ paste0('plot_hover_', subexp_name) ]])
     
-    hover <- input[[ paste0('plot_hover_', season_name) ]]
+    hover <- input[[ paste0('plot_hover_', subexp_name) ]]
     
     wellPanel(class = 'plot-hover-info push-down',
       HTML(paste0(
@@ -188,14 +198,14 @@ render_plot_hover <- function(season_name, input, output, full_cache_data) {
 }
 
 # render info box for date, type, and notes of selected (clicked) timeline item
-render_timeline_hover <- function(season_name, input, output, full_cache_data) {
+render_timeline_hover <- function(subexp_name, input, output, full_cache_data) {
   
-  output[[ paste0('mgmt_select_info_', season_name) ]] <- renderUI({
+  output[[ paste0('mgmt_select_info_', subexp_name) ]] <- renderUI({
     
-    req(input[[ paste0('mgmt_timeline_', season_name, '_selected') ]])
-    selected <- input[[ paste0('mgmt_timeline_', season_name, '_selected') ]]
+    req(input[[ paste0('mgmt_timeline_', subexp_name, '_selected') ]])
+    selected <- input[[ paste0('mgmt_timeline_', subexp_name, '_selected') ]]
     
-    management_data <- full_cache_data[[ season_name ]][[ 'managements' ]]
+    management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
     selected_record <- management_data[ as.numeric(selected), ]
     
     formatted_notes <- ''
@@ -214,35 +224,35 @@ render_timeline_hover <- function(season_name, input, output, full_cache_data) {
   })
 }
 
-render_map <- function(season_name, input, output, full_cache_data) {
+render_map <- function(subexp_name, input, output, full_cache_data) {
   
-  # render slider input from dates in a given season
-  output[[ paste0('map_date_slider_', season_name) ]] <- renderUI({
-    sliderInput(paste0('map_date_', season_name), 'Date', 
-                as.Date(full_cache_data[[ season_name ]][[ 'start_date']]), 
-                as.Date(full_cache_data[[ season_name ]][[ 'end_date' ]]),
-                as.Date(full_cache_data[[ season_name ]][[ 'end_date' ]]))
+  # render slider input from dates in a given subexperiment
+  output[[ paste0('map_date_slider_', subexp_name) ]] <- renderUI({
+    sliderInput(paste0('map_date_', subexp_name), 'Date', 
+                as.Date(full_cache_data[[ subexp_name ]][[ 'start_date']]), 
+                as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]),
+                as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]))
   })
   
-  # render heat map of sites from trait records in a given season, for the selected date, variable and cultivar
-  output[[ paste0('site_map_', season_name) ]] <- renderLeaflet({
+  # render heat map of sites from trait records in a given subexperiment, for the selected date, variable and cultivar
+  output[[ paste0('site_map_', subexp_name) ]] <- renderLeaflet({
     
-    req(input[[ paste0('selected_variable_', season_name) ]])
-    req(input[[ paste0('selected_cultivar_', season_name) ]])
-    req(input[[ paste0('map_date_', season_name) ]])
+    req(input[[ paste0('selected_variable_', subexp_name) ]])
+    req(input[[ paste0('selected_cultivar_', subexp_name) ]])
+    req(input[[ paste0('map_date_', subexp_name) ]])
     
-    selected_variable <- input[[ paste0('selected_variable_', season_name) ]]
-    selected_cultivar <- input[[ paste0('selected_cultivar_', season_name) ]]
-    render_date <- input [[ paste0('map_date_', season_name) ]]
+    selected_variable <- input[[ paste0('selected_variable_', subexp_name) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', subexp_name) ]]
+    render_date <- input [[ paste0('map_date_', subexp_name) ]]
     
-    traits <- full_cache_data[[ season_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     
     if (selected_cultivar != 'None'){
       traits <- subset(traits, cultivar_name == selected_cultivar)
     }
       
     
-    units <- full_cache_data[[ season_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
+    units <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
     if (units != '') {
       units <- paste0('(', units, ')')
     }
@@ -253,22 +263,27 @@ render_map <- function(season_name, input, output, full_cache_data) {
   })
 }
 
-# render outputs for a given season
-render_season_output <- function(season_name, input, output, full_cache_data) {
+# render outputs for a given subexperiment
+render_subexp_output <- function(subexp_name, input, output, full_cache_data) {
   
-  render_variable_menu(season_name, output, full_cache_data)
+  render_variable_menu(subexp_name, output, full_cache_data)
   
-  render_cultivar_menu(season_name, input, output, full_cache_data)
+  render_cultivar_menu(subexp_name, input, output, full_cache_data)
   
-  render_trait_plot(season_name, input, output, full_cache_data)
+  render_trait_plot(subexp_name, input, output, full_cache_data)
   
-  render_mgmt_timeline(season_name, input, output, full_cache_data)
+  render_mgmt_timeline(subexp_name, input, output, full_cache_data)
   
-  render_plot_hover(season_name, input, output, full_cache_data)
+  render_plot_hover(subexp_name, input, output, full_cache_data)
   
-  render_timeline_hover(season_name, input, output, full_cache_data)
+  render_timeline_hover(subexp_name, input, output, full_cache_data)
 
-  render_map(season_name, input, output, full_cache_data)
+  render_map(subexp_name, input, output, full_cache_data)
+}
+
+render_experiment_output <- function(experiment_name, input, output, full_cache_data) {
+  
+  lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, input, output, full_cache_data[[ experiment_name ]])
 }
 
 server <- function(input, output) {
@@ -280,14 +295,14 @@ server <- function(input, output) {
     
   load('cache.RData')
   
-  # render UI for all available seasons
+  # render UI for all available experiments
   output$page_content <- renderUI({
-    season_tabs <- lapply(names(full_cache_data), render_season_ui)
-    do.call(tabsetPanel, season_tabs)
+    subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)
+    do.call(tabsetPanel, subexp_tabs)
   })
   
-  # render outputs for all available seasons
-  lapply(names(full_cache_data), render_season_output, input, output, full_cache_data)
+  # render outputs for all available experiments
+  lapply(names(full_cache_data), render_experiment_output, input, output, full_cache_data)
 }
 
 shinyApp(ui = ui, server = server)
