@@ -5,6 +5,7 @@ library(timevis)
 library(leaflet)
 library(cronR)
 library(shinythemes)
+library(scales)
 
 source('render-site-map.R')
 
@@ -114,17 +115,21 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
     units <- selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
     title <- ifelse(units == '', selected_variable, paste0(selected_variable, ' (', units, ')'))
     
-    trait_plot <- ggplot() + 
-      geom_violin(data = plot_data, scale = 'width', width = 1,
-                   aes(x = as.Date(date), y = mean, 
-                       group = as.Date(date))) +
-      geom_boxplot(data = plot_data, 
-                  aes(x = as.Date(date), y = mean, 
-                      group = as.Date(date)), 
-                  outlier.alpha = 0.25, width = 0.2)  
-#      geom_point(data = plot_data, 
-#                 aes(x = as.Date(date), y = mean), 
-#                 alpha = 0.1, size = 0.1, position = position_jitter(width = 0.1))
+    num_unique_vals <- length(unique(plot_data[[ 'mean' ]]))
+    
+    trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean))
+      {
+        if (num_unique_vals < 20) {
+          trait_plot <- trait_plot + 
+            geom_count() + 
+            geom_vline(aes(xintercept = as.numeric(as.Date(date))),
+                       color = 'grey')         }
+        else {
+          trait_plot <- trait_plot + 
+            geom_violin(scale = 'width', width = 1, aes(group = as.Date(date))) +
+            geom_boxplot(outlier.alpha = 0.25, width = 0.2, aes(group = as.Date(date)))
+        }
+      }
       
     if (selected_cultivar != 'None') {
         title <- paste0(title, '\nCultivar ', selected_cultivar, ' in red')
