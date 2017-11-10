@@ -119,9 +119,11 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
     
     trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean))
       {
-        if (num_unique_vals < 15) {
-          trait_plot <- trait_plot + geom_count() + geom_vline(aes(xintercept = as.numeric(as.Date(date))))
-        }
+        if (num_unique_vals < 20) {
+          trait_plot <- trait_plot + 
+            geom_count() + 
+            geom_vline(aes(xintercept = as.numeric(as.Date(date))),
+                       color = 'grey')         }
         else {
           trait_plot <- trait_plot + 
             geom_violin(scale = 'width', width = 1, aes(group = as.Date(date))) +
