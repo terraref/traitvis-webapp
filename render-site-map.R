@@ -14,7 +14,10 @@ render_site_map <- function(traits, render_date, legend_title) {
   )
   
   map <- leaflet(options = leafletOptions(minZoom = 18, maxZoom = 21))  %>% 
-    addProviderTiles(providers$Esri.WorldImagery) # eventually want to overlay with stitched image from current day
+    addProviderTiles(providers$Esri.WorldImagery) 
+  # eventually want to overlay with stitched image from current day
+  # see /data/terraref/sites/ua-mac/Level_1/fullfield/
+  # see addRasterImage https://rstudio.github.io/leaflet/raster.html
 
   # add polygon for each site, color by trait mean value
   if (nrow(latest_traits) > 0) {
