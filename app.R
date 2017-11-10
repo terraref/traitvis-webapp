@@ -115,7 +115,7 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
     units <- selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
     title <- ifelse(units == '', selected_variable, paste0(selected_variable, ' (', units, ')'))
     
-    num_unique_vals = length(unique(plot_data[[ 'mean' ]]))
+    num_unique_vals <- length(unique(plot_data[[ 'mean' ]]))
     
     trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean))
       {
