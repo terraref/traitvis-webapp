@@ -279,11 +279,15 @@ render_subexp_output <- function(subexp_name, input, output, full_cache_data) {
   
   render_trait_plot(subexp_name, input, output, full_cache_data)
   
-  render_mgmt_timeline(subexp_name, input, output, full_cache_data)
-  
   render_plot_hover(subexp_name, input, output, full_cache_data)
   
-  render_timeline_hover(subexp_name, input, output, full_cache_data)
+  if (!is.null(full_cache_data[[ subexp_name ]][[ 'managements' ]])) {
+    
+    render_mgmt_timeline(subexp_name, input, output, full_cache_data)
+    
+    render_timeline_hover(subexp_name, input, output, full_cache_data)
+    
+  }
 
   render_map(subexp_name, input, output, full_cache_data)
 }
