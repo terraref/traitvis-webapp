@@ -92,14 +92,13 @@ get_data_for_subexp <- function(subexp, exp_name) {
     semi_join(traits, by = 'treatment_id') %>%
     collect() %>% unlist(use.names = FALSE)
   
-  managements <- tbl(bety_src, 'managements') %>%
+  if (!is.null(management_ids)) {
+    subexp_data[[ 'managements' ]] <- tbl(bety_src, 'managements') %>%
     filter(date >= subexp[[ 'start_date' ]] & date <= subexp[[ 'end_date' ]]) %>%
     filter(id %in% management_ids) %>%
     select(id, date, mgmttype, notes) %>%
     collect()
-  
-  # save management data
-  subexp_data[[ 'managements' ]] <- managements
+  }
   
   # load existing full_cache_data object if exists, otherwise use empty list object
   full_cache_data <- list()
