@@ -62,7 +62,7 @@ After updating the master branch on GitHub, a new Docker image is built on [Dock
 Login to server (requires authentication)
 
 ```sh
-ssh core@282.284.420.38
+ssh core@282.284.420.38 # = ip x 2
 ```
 
 See what is running in the terraref namespace, including extractors and traitvis
