@@ -9,6 +9,11 @@ library(scales)
 
 source('render-site-map.R')
 
+## populate cache
+if (!file.exists('cache.RData')){
+  source('cache-refresh.R')
+}
+
 # schedule daily execution of cache refresh
 cache_update_cmd <- cron_rscript('cache-refresh.R')
 
@@ -300,9 +305,6 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
-  if (!file.exists('cache.RData')){
-    source('cache-refresh.R')
-  }
     
   load('cache.RData')
   
