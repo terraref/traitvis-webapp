@@ -55,6 +55,49 @@ There are three methods that you can use access to the TERRAREF instance of BETY
     load.bety.sh -m 99 -r 6 -w https://terraref.ncsa.illinois.edu/bety/dump/bety6/bety.tar.gz
     ```
 
+#### Deploy Updates on Nebula / Kubernetes
+
+After updating the master branch on GitHub, a new Docker image is built on [Docker hub](https://hub.docker.com/r/terraref/traitvis-webapp/builds/). The following commands can be used to deploy and inspect this app as it is being served at traitvis.workbench.org
+
+Login to server (requires authentication)
+
+```sh
+ssh core@282.284.420.38 # = ip x 2
+```
+
+See what is running in the terraref namespace, including extractors and traitvis
+
+```sh
+kubectl get pods --namespace=terraref
+``` 
+
+
+The following restarts the container, which triggers the most recent image from [docker hub](https://hub.docker.com/r/terraref/traitvis-webapp/builds/) to be downloaded. 
+
+```sh
+kubectl delete pod terraref-traitvis-xxxx --namespace=terraref
+#xxxx is a random string.
+``` 
+
+
+Show status (i.e. ContainerCreating, Running, etc)
+
+```sh
+kubectl get pods --namespace=terraref
+```
+
+to see logs:
+
+```sh
+kubectl logs -f terraref-traitvis-xxxx --namespace=terraref
+```
+
+
+to get an interactive terminal 
+
+```sh
+kubectl --namespace=terraref exec -it terraref-traitvis-xxxx bash
+```
 
 ### Configuring a Server
 
