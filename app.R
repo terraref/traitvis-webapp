@@ -119,7 +119,7 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
     all_vals_integers <- all(unique_vals %%1 == 0)
     num_unique_vals <- length(unique_vals)
     
-    trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean))
+    trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean, color = author))
       {
         if ((num_unique_vals < 20) & (max(unique_vals) < 30) & all_vals_integers) {
           trait_plot <- trait_plot + 
