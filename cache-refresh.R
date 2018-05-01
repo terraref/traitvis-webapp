@@ -51,7 +51,8 @@ get_data_for_subexp <- function(subexp, exp_name) {
   
   cultivars_table <- tbl(bety_src, 'cultivars') %>%
     # dplyr::rename(cultivar_id = id, cultivar_name = name) %>% 
-    # workaround bug in dplyr https://github.com/tidyverse/dplyr/issues/2943 that causes bug in
+    # workaround bug in dplyr https://github.com/tidyverse/dplyr/issues/2943 that causes bug
+    #    has been fixed now ... 
     rename(cultivar_id = id) %>% 
     rename(cultivar_name = name) %>%
     select(cultivar_id, cultivar_name) 

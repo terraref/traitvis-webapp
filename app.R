@@ -9,17 +9,16 @@ library(scales)
 
 source('render-site-map.R')
 
-## populate cache
-if (!file.exists('cache.RData')){
-  source('cache-refresh.R')
-}
-
 # schedule daily execution of cache refresh
 cache_update_cmd <- cron_rscript('cache-refresh.R')
 
 cron_clear(ask = FALSE)
 cron_add(command = cache_update_cmd, frequency = 'daily', 
          id = 'cache-update', description = 'daily update of BETYdb cache')
+
+if (!file.exists('cache.RData')){
+  source('cache-refresh.R')
+}
 
 # set page UI
 ui <- fluidPage(theme = shinytheme('flatly'),
@@ -121,11 +120,15 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
     title <- ifelse(units == '', selected_variable, paste0(selected_variable, ' (', units, ')'))
     
     unique_vals <- unique(plot_data[[ 'mean' ]])
-    all_vals_integers <- all(unique_vals %%1 == 0)
+    all_vals_integers <- all(unique_vals %% 1 == 0)
     num_unique_vals <- length(unique_vals)
-    
-    trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean, color = author))
-      {
+    num_uniq_methods <- length(unique(plot_data[['method']]))
+    plot_data$method[is.na(plot_data$method) | plot_data$method == 'NA'] <- 'Not Provided'
+
+    trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean, color = method)) +
+      scale_colour_brewer(palette = "Set1")
+
+    {
         if ((num_unique_vals < 20) & (max(unique_vals) < 30) & all_vals_integers) {
           trait_plot <- trait_plot + 
             geom_count() + 
@@ -142,9 +145,9 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
         title <- paste0(title, '\nCultivar ', selected_cultivar, ' in red')
         trait_plot <- trait_plot + 
           geom_point(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                     color = 'red', aes(x = as.Date(date), y = mean, group = site_id)) +
+                     aes(x = as.Date(date), y = mean, group = site_id)) +
           geom_line(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                     size = 0.25, color = 'red', alpha = 0.25, aes(x = as.Date(date), y = mean, group = site_id)) 
+                     size = 0.5, alpha = 0.5, aes(x = as.Date(date), y = mean, group = site_id)) 
     }
     
     trait_plot + 
@@ -154,7 +157,7 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
         y = units
       ) +
       theme_bw() + 
-      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none") +
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) +
       xlim(as.Date(selected_subexp_data[[ 'start_date' ]]), as.Date(selected_subexp_data[[ 'end_date' ]])) +
       ylim(0, data_max)
   })
@@ -305,7 +308,7 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
-    
+
   load('cache.RData')
   
   # render UI for all available experiments
