@@ -122,7 +122,7 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
     unique_vals <- unique(plot_data[[ 'mean' ]])
     all_vals_integers <- all(unique_vals %% 1 == 0)
     num_unique_vals <- length(unique_vals)
-    num_uniq_methods <- length(unique(plot_data[['method']]))
+
     plot_data$method[is.na(plot_data$method) | plot_data$method == 'NA'] <- 'Not Provided'
 
     trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean, color = method)) +
