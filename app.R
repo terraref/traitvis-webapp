@@ -17,6 +17,7 @@ cron_add(command = cache_update_cmd, frequency = 'daily',
          id = 'cache-update', description = 'daily update of BETYdb cache')
 
 if (!file.exists('cache.RData')){
+  message("Calling cache-refresh.R to create cache.RData for the first time.")
   source('cache-refresh.R')
 }
 
