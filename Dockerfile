@@ -26,7 +26,10 @@ RUN apt-get update -qq \
          RPostgreSQL \
          timevis \
       && rm -rf /srv/shiny-server/sample-apps
-      
+
+COPY cache-refresh.R /etc/cache-refresh.R
+RUN Rscript /etc/cache-refresh.R
+
 COPY . /srv/shiny-server/
 COPY shiny-server.conf /etc/shiny-server/
 RUN chown -R shiny:shiny /srv/shiny-server && \
