@@ -134,8 +134,8 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
           trait_plot <- trait_plot + 
             geom_count() + 
             geom_vline(aes(xintercept = as.numeric(as.Date(date))),
-                       color = 'grey')         }
-        else {
+                       color = 'grey')
+        } else {
           trait_plot <- trait_plot + 
             geom_violin(scale = 'width', width = 1, aes(group = as.Date(date))) +
             geom_boxplot(outlier.alpha = 0.25, width = 0.2, aes(group = as.Date(date)))
