@@ -103,10 +103,15 @@ kubectl --namespace=terraref exec -it terraref-traitvis-xxxx bash
 
 This is the manual version of what is automated using Docker.
 
-#### Dependencies
+#### System Dependencies
 
+##### OSX 
 
-#### System Programs 
+```sh
+brew install geos
+```
+
+##### Ubuntu 
 
 cron (Ubuntu)
 
