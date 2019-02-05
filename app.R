@@ -9,17 +9,6 @@ library(scales)
 
 source('render-site-map.R')
 
-# schedule daily execution of cache refresh
-cache_update_cmd <- cron_rscript('cache-refresh.R')
-
-cron_clear(ask = FALSE)
-cron_add(command = cache_update_cmd, frequency = 'daily', 
-         id = 'cache-update', description = 'daily update of BETYdb cache')
-
-if (!file.exists('cache.RData')){
-  source('cache-refresh.R')
-}
-
 # set page UI
 ui <- fluidPage(theme = shinytheme('flatly'),
   
@@ -301,7 +290,6 @@ render_subexp_output <- function(subexp_name, input, output, full_cache_data) {
 }
 
 render_experiment_output <- function(experiment_name, input, output, full_cache_data) {
-  
   lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, input, output, full_cache_data[[ experiment_name ]])
 }
 
@@ -310,7 +298,10 @@ server <- function(input, output) {
   # load 'full_cache_data' object from cache file
 
   load('cache.RData')
-  
+  full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", 
+                                       "MAC Season 1", "MAC Season 2", 
+                                       "MAC Season 3", "MAC Season 4", 
+                                       "MAC Season 6")]
   # render UI for all available experiments
   output$page_content <- renderUI({
     subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)
