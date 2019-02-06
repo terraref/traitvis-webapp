@@ -27,6 +27,8 @@ To enter the container bash shell as root, e.g. for development, testing, review
 docker run --rm -t -i shiny-traits /bin/bash
 ```
 
+The shiny-server.conf file is used to increase the default timeout to avoid errors on initialization if BETYdb is taking time to load.
+
 ### Database Connection
 
 This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.

@@ -22,6 +22,8 @@ bety_src <- src_postgres(
 # get all relevant data from BETYdb for a given subexperiment, write to cache file
 get_data_for_subexp <- function(subexp, exp_name) {
 
+  message("Downloading data for ", exp_name, " : ", subexp[[ 'name' ]])
+
   # destination for all data for given subexperiment
   subexp_data <- list(start_date = subexp[[ 'start_date' ]], end_date = subexp[[ 'end_date' ]])
   
@@ -138,3 +140,4 @@ experiments <- tbl(bety_src, 'experiments') %>%
 
 exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
 lapply(exp_names, get_data_for_exp, experiments)
+message("Completed cache refresh properly.")
