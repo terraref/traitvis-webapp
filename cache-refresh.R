@@ -37,7 +37,7 @@ get_data_for_subexp <- function(subexp, exp_name) {
   
   # only use trait records associated with the relevant sites
   traits_table <- tbl(bety_src, 'traits', n = Inf) %>%
-    filter(date >= subexp[[ 'start_date' ]] & date <= subexp[[ 'end_date' ]]) %>%
+    filter(date >= subexp[[ 'start_date' ]] & date <= subexp[[ 'end_date' ]] & checked >= 0) %>%
     filter(site_id %in% site_ids) %>%
     select(date, mean, variable_id, cultivar_id, treatment_id, site_id, method_id)
   

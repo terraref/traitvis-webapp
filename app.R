@@ -302,7 +302,6 @@ render_subexp_output <- function(subexp_name, input, output, full_cache_data) {
 }
 
 render_experiment_output <- function(experiment_name, input, output, full_cache_data) {
-  
   lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, input, output, full_cache_data[[ experiment_name ]])
 }
 
@@ -311,7 +310,10 @@ server <- function(input, output) {
   # load 'full_cache_data' object from cache file
 
   load('cache.RData')
-  
+  full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", 
+                                       "MAC Season 1", "MAC Season 2", 
+                                       "MAC Season 3", "MAC Season 4", 
+                                       "MAC Season 6")]
   # render UI for all available experiments
   output$page_content <- renderUI({
     subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)
