@@ -112,6 +112,7 @@ get_data_for_subexp <- function(subexp, exp_name) {
   # load existing full_cache_data object if exists, otherwise use empty list object
   full_cache_data <- list()
   if (file.exists("cache.RData")){
+    print("cache.RData already exists!")
     load("cache.RData")
   }
   
@@ -121,6 +122,7 @@ get_data_for_subexp <- function(subexp, exp_name) {
   
   # save data for given subexp
   full_cache_data[[ exp_name ]][[ subexp[['name']] ]] <- subexp_data
+  print("saving new data to file")
   save(full_cache_data, file = "cache.RData", compress = FALSE)
 }
 
