@@ -4,7 +4,7 @@ library(lubridate)
 options(scipen = 999)
 
 print(getwd())
-print("thas is the current directory")
+print("that is the current directory")
 
 # set up remote connection to BETYdb
 # bety_src <- src_postgres(
@@ -126,7 +126,11 @@ get_data_for_subexp <- function(subexp, exp_name) {
   # save data for given subexp
   full_cache_data[[ exp_name ]][[ subexp[['name']] ]] <- subexp_data
   print("saving new data to file")
-  save(full_cache_data, file = "cache.RData.temp", compress = FALSE)
+  file.create("/srv/shiny-server/cache/cache.RData.temp")
+  save(full_cache_data, file = "/srv/shiny-server/cache/cache.RData.temp", compress = FALSE)
+  # copy file to cache.RData
+  file.copy("/srv/shiny-server/cache/cache.RData.temp","/srv/shiny-server/cache/cache.RData",overwrite=TRUE)
+
 }
 
 # get data for each experiment by subexperiment
