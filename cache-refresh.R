@@ -7,21 +7,14 @@ print(getwd())
 print("that is the current directory")
 
 # set up remote connection to BETYdb
-# bety_src <- src_postgres(
-#   dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
-#   password = ifelse(Sys.getenv('bety_password') == '', 'bety', Sys.getenv('bety_password')),
-#   host     = ifelse(Sys.getenv('bety_host')     == '', 'bety.terraref', Sys.getenv('bety_host')),
-#   port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
-#   user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
-# )
-# 
 bety_src <- src_postgres(
-  dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
-  password = ifelse(Sys.getenv('bety_password') == '', 'DelchevskoOro', Sys.getenv('bety_password')),
-  host     = ifelse(Sys.getenv('bety_host')     == '', 'bety6.ncsa.illinois.edu', Sys.getenv('bety_host')),
-  port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
-  user     = ifelse(Sys.getenv('bety_user')     == '', 'viewer', Sys.getenv('bety_user'))
+ dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
+ password = ifelse(Sys.getenv('bety_password') == '', 'bety', Sys.getenv('bety_password')),
+ host     = ifelse(Sys.getenv('bety_host')     == '', 'bety.terraref', Sys.getenv('bety_host')),
+ port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
+ user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
 )
+
 # get all relevant data from BETYdb for a given subexperiment, write to cache file
 get_data_for_subexp <- function(subexp, exp_name) {
 
