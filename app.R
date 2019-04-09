@@ -9,6 +9,8 @@ library(scales)
 
 source('render-site-map.R')
 
+cache_path <- "/srv/shiny-server/cache/cache.RData"
+
 # set page UI
 ui <- fluidPage(theme = shinytheme('flatly'),
   
@@ -297,7 +299,7 @@ server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
 
-  load('cache.RData')
+  load(cache_path)
   full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", 
                                        "MAC Season 1", "MAC Season 2", 
                                        "MAC Season 3", "MAC Season 4", 

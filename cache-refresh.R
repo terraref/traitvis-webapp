@@ -3,33 +3,18 @@ library(tools)
 library(lubridate)
 options(scipen = 999)
 
-print(getwd())
-print("that is the current directory")
-
-# delete any old temp file
-if (file.exists("cache.RData")){
-    print("existing temp file found, deleting")
-    file.remove("/srv/shiny-server/cache/cache.RData.temp")
-  }
-# create new temp file
-file.create("/srv/shiny-server/cache/cache.RData.temp")
-
 # set up remote connection to BETYdb
-# bety_src <- src_postgres(
-#   dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
-#   password = ifelse(Sys.getenv('bety_password') == '', 'bety', Sys.getenv('bety_password')),
-#   host     = ifelse(Sys.getenv('bety_host')     == '', 'bety.terraref', Sys.getenv('bety_host')),
-#   port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
-#   user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
-# )
-# 
 bety_src <- src_postgres(
-  dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
-  password = ifelse(Sys.getenv('bety_password') == '', 'DelchevskoOro', Sys.getenv('bety_password')),
-  host     = ifelse(Sys.getenv('bety_host')     == '', 'bety6.ncsa.illinois.edu', Sys.getenv('bety_host')),
-  port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
-  user     = ifelse(Sys.getenv('bety_user')     == '', 'viewer', Sys.getenv('bety_user'))
+ dbname   = ifelse(Sys.getenv('bety_dbname')   == '', 'bety', Sys.getenv('bety_dbname')),
+ password = ifelse(Sys.getenv('bety_password') == '', 'bety', Sys.getenv('bety_password')),
+ host     = ifelse(Sys.getenv('bety_host')     == '', 'bety.terraref', Sys.getenv('bety_host')),
+ port     = ifelse(Sys.getenv('bety_port')     == '', '5432', Sys.getenv('bety_port')),
+ user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
 )
+
+cache_path <- "/srv/shiny-server/cache/cache.RData"
+cache_path_temp <- "/srv/shiny-server/cache/cache.RData.tmp"
+
 # get all relevant data from BETYdb for a given subexperiment, write to cache file
 get_data_for_subexp <- function(subexp, exp_name) {
 
@@ -122,9 +107,8 @@ get_data_for_subexp <- function(subexp, exp_name) {
   
   # load existing full_cache_data object if exists, otherwise use empty list object
   full_cache_data <- list()
-  if (file.exists("cache.RData")){
-    print("cache.RData already exists!")
-    load("cache.RData")
+  if (file.exists(cache_path)){
+    load(cache_path)
   }
   
   if (!(exp_name %in% names(full_cache_data))) {
@@ -133,19 +117,12 @@ get_data_for_subexp <- function(subexp, exp_name) {
   
   # save data for given subexp
   full_cache_data[[ exp_name ]][[ subexp[['name']] ]] <- subexp_data
-  print("saving new data to file for experiment")
-  print(exp_name)
-  save(full_cache_data, file = "/srv/shiny-server/cache/cache.RData.temp", compress = FALSE)
-  current_size_tempfile = file.size("/srv/shiny-server/cache/cache.RData.temp")
-  print("current size of temp file is")
-  print(current_size_tempfile)
-  # copy file to cache.RData
-  file.copy("/srv/shiny-server/cache/cache.RData.temp","/srv/shiny-server/cache/cache.RData")
-  current_size_cache_file = file.size("/srv/shiny-server/cache/cache.RData")
-  print('current cachefile size')
-  print(current_size_cache_file)
-}
+  file.create(cache_path_temp)
+  save(full_cache_data, file=cache_path_temp, compress=FALSE)
+  #  file to cache.RData
+  file.rename(cache_path_temp, cache_path)
 
+}
 
 # get data for each experiment by subexperiment
 get_data_for_exp <- function(exp_name, experiments) {
@@ -161,4 +138,3 @@ experiments <- tbl(bety_src, 'experiments') %>%
 
 exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
 lapply(exp_names, get_data_for_exp, experiments)
-

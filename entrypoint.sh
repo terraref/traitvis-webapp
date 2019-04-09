@@ -13,10 +13,6 @@ update)
   Rscript ./srv/shiny-server/cache-refresh.R
   ;;
 
-test)
-  echo "IT IS A TEST"
-  Rscript ./srv/shiny-server/test.R
-  ;;
 *)
   exec "$@"
   ;;
