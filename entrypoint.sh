@@ -4,13 +4,13 @@ set -e
 
 case $1 in
 server)
-  echo "IT IS A SERVER"
-  Rscript ./srv/shiny-server/app.R
+  echo "Starting Shiny server."
+  exec /usr/bin/shiny-server.sh
   ;;
 
 update)
-  echo "UPDATE DATA FILE"
-  Rscript ./srv/shiny-server/cache-refresh.R
+  echo "Starting cache-refresh script."
+  exec Rscript ./srv/shiny-server/cache-refresh.R
   ;;
 
 *)
