@@ -312,8 +312,6 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
   lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, input, output, full_cache_data[[ experiment_name ]])
 }
 
-
-
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
@@ -328,7 +326,5 @@ server <- function(input, output) {
   # render outputs for all available experiments
   lapply(names(full_cache_data), render_experiment_output, input, output, full_cache_data)
 }
-
-
 
 shinyApp(ui = ui, server = server)
