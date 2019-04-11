@@ -11,9 +11,26 @@ source('render-site-map.R')
 
 cache_path <- "/srv/shiny-server/cache/cache.RData"
 
+cache_mod_time <- NA
+
+full_cache_data <- NA
+
+load_cache <- function() {
+    cache_mod_time <- file.mtime(cache_path)
+
+
+    load(cache_path)
+    full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016",
+    "MAC Season 1", "MAC Season 2",
+    "MAC Season 3", "MAC Season 4",
+    "MAC Season 6")]
+}
+
 # set page UI
 ui <- fluidPage(theme = shinytheme('flatly'),
-  
+
+  load_cache()
+
   tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
   title = 'TERRA-REF Experiment Data',
   
@@ -295,15 +312,13 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
   lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, input, output, full_cache_data[[ experiment_name ]])
 }
 
+
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
 
-  load(cache_path)
-  full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", 
-                                       "MAC Season 1", "MAC Season 2", 
-                                       "MAC Season 3", "MAC Season 4", 
-                                       "MAC Season 6")]
+  load_cache()
   # render UI for all available experiments
   output$page_content <- renderUI({
     subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)
@@ -313,5 +328,7 @@ server <- function(input, output) {
   # render outputs for all available experiments
   lapply(names(full_cache_data), render_experiment_output, input, output, full_cache_data)
 }
+
+
 
 shinyApp(ui = ui, server = server)
