@@ -10,32 +10,33 @@ library(scales)
 source('render-site-map.R')
 
 cache_path <- "/srv/shiny-server/cache/cache.RData"
-
-cache_mod_time <- NA
-
+cache_mod_time <- file.mtime(cache_path)
 full_cache_data <- NA
 
-load_cache <- function() {
-    cache_mod_time <- file.mtime(cache_path)
+load_cache <- function(full_cache_data) {
+    curr_mod_time <- file.mtime(cache_path)
 
-
-    load(cache_path)
-    full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016",
-    "MAC Season 1", "MAC Season 2",
-    "MAC Season 3", "MAC Season 4",
-    "MAC Season 6")]
+    if (curr_mod_time > cache_mod_time || is.na(full_cache_data)) {
+        cat(file=stderr(), "Loading cache.RData file.", "\n")
+        load(cache_path)
+        full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016",
+        "MAC Season 1", "MAC Season 2",
+        "MAC Season 3", "MAC Season 4",
+        "MAC Season 6")]
+        cache_mod_time <- curr_mod_time
+        cat(file=stderr(), "Loading cache.RData file completed.", "\n")
+        return(full_cache_data)
+    } else {
+        cat(file=stderr(), "Latest cache.RData file already loaded.", "\n")
+        return(full_cache_data)
+    }
 }
 
 # set page UI
 ui <- fluidPage(theme = shinytheme('flatly'),
-
-  load_cache()
-
   tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
   title = 'TERRA-REF Experiment Data',
-  
   tags$img(src = 'logo.png', class = 'push-out'),
-  
   # destination for all dynamic UI elements
   uiOutput('page_content')
 )
@@ -315,8 +316,8 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
+  full_cache_data <- load_cache(full_cache_data)
 
-  load_cache()
   # render UI for all available experiments
   output$page_content <- renderUI({
     subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)

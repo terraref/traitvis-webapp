@@ -119,8 +119,6 @@ get_data_for_subexp <- function(subexp, exp_name) {
   full_cache_data[[ exp_name ]][[ subexp[['name']] ]] <- subexp_data
   file.create(cache_path_temp)
   save(full_cache_data, file=cache_path_temp, compress=FALSE)
-  #  file to cache.RData
-  file.rename(cache_path_temp, cache_path)
 
 }
 
@@ -138,3 +136,4 @@ experiments <- tbl(bety_src, 'experiments') %>%
 
 exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
 lapply(exp_names, get_data_for_exp, experiments)
+file.rename(cache_path_temp, cache_path)
