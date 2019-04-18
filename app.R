@@ -42,33 +42,35 @@ ui <- fluidPage(theme = shinytheme('flatly'),
 )
 
 # render UI for a given subexperiment
-render_subexp_ui <- function(subexp_name) {
+render_subexp_ui <- function(subexp_name, exp_name) {
+  
+  id_str <- paste0(exp_name, '_', subexp_name)
   
   tabPanel(subexp_name,
     
     sidebarPanel(class = 'push-down',
-      uiOutput(paste0('variable_select_', subexp_name)),
-      uiOutput(paste0('cultivar_select_', subexp_name))
+      uiOutput(paste0('variable_select_', id_str)),
+      uiOutput(paste0('cultivar_select_', id_str))
     ),
      
-    uiOutput(paste0(paste0('plot_hover_info_', subexp_name))),
+    uiOutput(paste0('plot_hover_info_', id_str)),
     
     mainPanel(class = 'main-panel',
     
     tabsetPanel(
         tabPanel('Plot',
           div(class = 'push-down',
-            plotOutput(paste0('trait_plot_', subexp_name), 
-                        hover = hoverOpts(id = paste0('plot_hover_', subexp_name)))
+            plotOutput(paste0('trait_plot_', id_str), 
+                        hover = hoverOpts(id = paste0('plot_hover_', id_str)))
           ),
           hr(),
-          uiOutput(paste0('mgmt_select_info_', subexp_name)),
-          timevisOutput(paste0('mgmt_timeline_', subexp_name))
+          uiOutput(paste0('mgmt_select_info_', id_str)),
+          timevisOutput(paste0('mgmt_timeline_', id_str))
         ),
         tabPanel('Map',
           div(class = 'map-container push-out',
-            uiOutput(paste0('map_date_slider_', subexp_name)),
-            leafletOutput(paste0('site_map_', subexp_name), width = '600px', height = '600px')
+            uiOutput(paste0('map_date_slider_', id_str)),
+            leafletOutput(paste0('site_map_', id_str), width = '600px', height = '600px')
           )
         )
       )
@@ -78,7 +80,7 @@ render_subexp_ui <- function(subexp_name) {
 
 render_experiment_ui <- function(exp_name, full_cache_data) {
   
-  subexp_tabs <- lapply(names(full_cache_data[[ exp_name ]]), render_subexp_ui)
+  subexp_tabs <- lapply(names(full_cache_data[[ exp_name ]]), render_subexp_ui, exp_name)
   
   do.call(tabPanel, list(exp_name, div(class = 'push-down'),
     do.call(tabsetPanel, subexp_tabs))
@@ -86,41 +88,41 @@ render_experiment_ui <- function(exp_name, full_cache_data) {
 }
 
 # render selection menu from available variables in a given subexperiment
-render_variable_menu <- function(subexp_name, output, full_cache_data) {
+render_variable_menu <- function(subexp_name, id_str, output, full_cache_data) {
   
   variable_names <- names(full_cache_data[[ subexp_name ]][[ 'trait_data' ]])
   
-  output[[ paste0('variable_select_', subexp_name) ]] <- renderUI({
-    selectInput(paste0('selected_variable_', subexp_name), 'Variable', variable_names)
+  output[[ paste0('variable_select_', id_str) ]] <- renderUI({
+    selectInput(paste0('selected_variable_', id_str), 'Variable', variable_names)
   })
 }
 
 # render selection menu from available cultivars in a given subexperiment, for the selected variable
-render_cultivar_menu <- function(subexp_name, input, output, full_cache_data) {
+render_cultivar_menu <- function(subexp_name, id_str, input, output, full_cache_data) {
   
-  output[[ paste0('cultivar_select_', subexp_name) ]] <- renderUI({
+  output[[ paste0('cultivar_select_', id_str) ]] <- renderUI({
     
-    req(input[[ paste0('selected_variable_', subexp_name) ]])
+    req(input[[ paste0('selected_variable_', id_str) ]])
     
-    trait_records <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ input[[ paste0('selected_variable_', subexp_name) ]] ]][[ 'traits' ]]
+    trait_records <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ input[[ paste0('selected_variable_', id_str) ]] ]][[ 'traits' ]]
     unique_cultivars <- unique(trait_records[[ 'cultivar_name' ]])
     
-    selectInput(paste0('selected_cultivar_', subexp_name), 'Cultivar', c('None', unique_cultivars))
+    selectInput(paste0('selected_cultivar_', id_str), 'Cultivar', c('None', unique_cultivars))
   })
 }
 
 # render box plot time series from trait records in a given subexperiment, for the selected variable
 # if a cultivar is selected, render line plot from trait records for that cultivar
-render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
+render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_data) {
   
-  output[[ paste0('trait_plot_', subexp_name) ]] <- renderPlot({
+  output[[ paste0('trait_plot_', id_str) ]] <- renderPlot({
     
-    req(input[[ paste0('selected_variable_', subexp_name) ]])
-    req(input[[ paste0('selected_cultivar_', subexp_name) ]])
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    req(input[[ paste0('selected_cultivar_', id_str) ]])
     
     selected_subexp_data <- full_cache_data[[ subexp_name ]]
-    selected_variable <- input[[ paste0('selected_variable_', subexp_name) ]]
-    selected_cultivar <- input[[ paste0('selected_cultivar_', subexp_name) ]]
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
     
     plot_data <- selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     data_max <- max(plot_data[[ 'mean' ]])
@@ -142,8 +144,8 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
           trait_plot <- trait_plot + 
             geom_count() + 
             geom_vline(aes(xintercept = as.numeric(as.Date(date))),
-                       color = 'grey')         }
-        else {
+                       color = 'grey')
+        } else {
           trait_plot <- trait_plot + 
             geom_violin(scale = 'width', width = 1, aes(group = as.Date(date))) +
             geom_boxplot(outlier.alpha = 0.25, width = 0.2, aes(group = as.Date(date)))
@@ -173,9 +175,9 @@ render_trait_plot <- function(subexp_name, input, output, full_cache_data) {
 }
 
 # render timeline from management records in a given subexperiment
-render_mgmt_timeline <- function(subexp_name, input, output, full_cache_data) {
+render_mgmt_timeline <- function(subexp_name, id_str, input, output, full_cache_data) {
   
-  output[[ paste0('mgmt_timeline_', subexp_name) ]] <- renderTimevis({
+  output[[ paste0('mgmt_timeline_', id_str) ]] <- renderTimevis({
     
     management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
     
@@ -199,13 +201,13 @@ render_mgmt_timeline <- function(subexp_name, input, output, full_cache_data) {
 }
 
 # render info box for date and value of cursor when hovering box/line plot
-render_plot_hover <- function(subexp_name, input, output, full_cache_data) {
+render_plot_hover <- function(subexp_name, id_str, input, output, full_cache_data) {
   
-  output[[ paste0('plot_hover_info_', subexp_name) ]] <- renderUI({
+  output[[ paste0('plot_hover_info_', id_str) ]] <- renderUI({
     
-    req(input[[ paste0('plot_hover_', subexp_name) ]])
+    req(input[[ paste0('plot_hover_', id_str) ]])
     
-    hover <- input[[ paste0('plot_hover_', subexp_name) ]]
+    hover <- input[[ paste0('plot_hover_', id_str) ]]
     
     wellPanel(class = 'plot-hover-info push-down',
       HTML(paste0(
@@ -222,12 +224,12 @@ render_plot_hover <- function(subexp_name, input, output, full_cache_data) {
 }
 
 # render info box for date, type, and notes of selected (clicked) timeline item
-render_timeline_hover <- function(subexp_name, input, output, full_cache_data) {
+render_timeline_hover <- function(subexp_name, id_str, input, output, full_cache_data) {
   
-  output[[ paste0('mgmt_select_info_', subexp_name) ]] <- renderUI({
+  output[[ paste0('mgmt_select_info_', id_str) ]] <- renderUI({
     
-    req(input[[ paste0('mgmt_timeline_', subexp_name, '_selected') ]])
-    selected <- input[[ paste0('mgmt_timeline_', subexp_name, '_selected') ]]
+    req(input[[ paste0('mgmt_timeline_', id_str, '_selected') ]])
+    selected <- input[[ paste0('mgmt_timeline_', id_str, '_selected') ]]
     
     management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
     selected_record <- management_data[ as.numeric(selected), ]
@@ -248,26 +250,26 @@ render_timeline_hover <- function(subexp_name, input, output, full_cache_data) {
   })
 }
 
-render_map <- function(subexp_name, input, output, full_cache_data) {
+render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   # render slider input from dates in a given subexperiment
-  output[[ paste0('map_date_slider_', subexp_name) ]] <- renderUI({
-    sliderInput(paste0('map_date_', subexp_name), 'Date', 
+  output[[ paste0('map_date_slider_', id_str) ]] <- renderUI({
+    sliderInput(paste0('map_date_', id_str), 'Date', 
                 as.Date(full_cache_data[[ subexp_name ]][[ 'start_date']]), 
                 as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]),
                 as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]))
   })
   
   # render heat map of sites from trait records in a given subexperiment, for the selected date, variable and cultivar
-  output[[ paste0('site_map_', subexp_name) ]] <- renderLeaflet({
+  output[[ paste0('site_map_', id_str) ]] <- renderLeaflet({
     
-    req(input[[ paste0('selected_variable_', subexp_name) ]])
-    req(input[[ paste0('selected_cultivar_', subexp_name) ]])
-    req(input[[ paste0('map_date_', subexp_name) ]])
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    req(input[[ paste0('selected_cultivar_', id_str) ]])
+    req(input[[ paste0('map_date_', id_str) ]])
     
-    selected_variable <- input[[ paste0('selected_variable_', subexp_name) ]]
-    selected_cultivar <- input[[ paste0('selected_cultivar_', subexp_name) ]]
-    render_date <- input [[ paste0('map_date_', subexp_name) ]]
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
+    render_date <- input [[ paste0('map_date_', id_str) ]]
     
     traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     
@@ -288,29 +290,31 @@ render_map <- function(subexp_name, input, output, full_cache_data) {
 }
 
 # render outputs for a given subexperiment
-render_subexp_output <- function(subexp_name, input, output, full_cache_data) {
+render_subexp_output <- function(subexp_name, exp_name, input, output, full_cache_data) {
   
-  render_variable_menu(subexp_name, output, full_cache_data)
+  id_str <- paste0(exp_name, '_', subexp_name)
   
-  render_cultivar_menu(subexp_name, input, output, full_cache_data)
+  render_variable_menu(subexp_name, id_str, output, full_cache_data)
   
-  render_trait_plot(subexp_name, input, output, full_cache_data)
+  render_cultivar_menu(subexp_name, id_str, input, output, full_cache_data)
   
-  render_plot_hover(subexp_name, input, output, full_cache_data)
+  render_trait_plot(subexp_name, id_str, input, output, full_cache_data)
+  
+  render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
   
   if (!is.null(full_cache_data[[ subexp_name ]][[ 'managements' ]])) {
     
-    render_mgmt_timeline(subexp_name, input, output, full_cache_data)
+    render_mgmt_timeline(subexp_name, id_str, input, output, full_cache_data)
     
-    render_timeline_hover(subexp_name, input, output, full_cache_data)
+    render_timeline_hover(subexp_name, id_str, input, output, full_cache_data)
     
   }
 
-  render_map(subexp_name, input, output, full_cache_data)
+  render_map(subexp_name, id_str, input, output, full_cache_data)
 }
 
 render_experiment_output <- function(experiment_name, input, output, full_cache_data) {
-  lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, input, output, full_cache_data[[ experiment_name ]])
+  lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, experiment_name, input, output, full_cache_data[[ experiment_name ]])
 }
 
 server <- function(input, output) {

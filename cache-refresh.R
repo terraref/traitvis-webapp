@@ -18,6 +18,8 @@ cache_path_temp <- "/srv/shiny-server/cache/cache.RData.tmp"
 # get all relevant data from BETYdb for a given subexperiment, write to cache file
 get_data_for_subexp <- function(subexp, exp_name) {
 
+  message("Downloading data for ", exp_name, " : ", subexp[[ 'name' ]])
+
   # destination for all data for given subexperiment
   subexp_data <- list(start_date = subexp[[ 'start_date' ]], end_date = subexp[[ 'end_date' ]])
   
@@ -119,7 +121,6 @@ get_data_for_subexp <- function(subexp, exp_name) {
   full_cache_data[[ exp_name ]][[ subexp[['name']] ]] <- subexp_data
   file.create(cache_path_temp)
   save(full_cache_data, file=cache_path_temp, compress=FALSE)
-
 }
 
 # get data for each experiment by subexperiment
@@ -137,3 +138,6 @@ experiments <- tbl(bety_src, 'experiments') %>%
 exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
 lapply(exp_names, get_data_for_exp, experiments)
 file.rename(cache_path_temp, cache_path)
+
+message("Completed cache refresh properly.")
+
