@@ -19,10 +19,8 @@ load_cache <- function(full_cache_data) {
     if (curr_mod_time > cache_mod_time || is.na(full_cache_data)) {
         cat(file=stderr(), "Loading cache.RData file.", "\n")
         load(cache_path)
-        full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016",
-        "MAC Season 1", "MAC Season 2",
-        "MAC Season 3", "MAC Season 4",
-        "MAC Season 6")]
+        # TODO: See if it works if we omit this line
+        # full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", "MAC Season 1", "MAC Season 2", "MAC Season 3", "MAC Season 4", "MAC Season 6")]
         cache_mod_time <- curr_mod_time
         cat(file=stderr(), "Loading cache.RData file completed.", "\n")
         return(full_cache_data)

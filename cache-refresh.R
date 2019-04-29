@@ -109,8 +109,8 @@ get_data_for_subexp <- function(subexp, exp_name) {
   
   # load existing full_cache_data object if exists, otherwise use empty list object
   full_cache_data <- list()
-  if (file.exists(cache_path)){
-    load(cache_path)
+  if (file.exists(cache_path_temp)){
+    load(cache_path_temp)
   }
   
   if (!(exp_name %in% names(full_cache_data))) {
