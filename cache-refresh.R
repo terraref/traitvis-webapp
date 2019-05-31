@@ -13,9 +13,9 @@ bety_src <- src_postgres(
 )
 
 # create cache folder in same directory as this script (will do nothing if already exists)
-dir.create("cache", showWarnings = FALSE)
-cache_path <- "cache/cache.RData"
-cache_path_temp <- "cache/cache.RData.tmp"
+dir.create("./cache", showWarnings = FALSE)
+cache_path <- "./cache/cache.RData"
+cache_path_temp <- "./cache/cache.RData.tmp"
 
 # get all relevant data from BETYdb for a given subexperiment, write to cache file
 get_data_for_subexp <- function(subexp, exp_name) {
