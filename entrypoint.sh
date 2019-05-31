@@ -10,7 +10,8 @@ server)
 
 update)
   echo "Starting cache-refresh script."
-  exec Rscript ./srv/shiny-server/cache-refresh.R
+  cd /srv/shiny-server
+  exec Rscript ./cache-refresh.R
   ;;
 
 *)
