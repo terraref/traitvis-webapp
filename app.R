@@ -76,6 +76,7 @@ render_subexp_ui <- function(subexp_name, exp_name) {
         tabPanel('Map',
           div(class = 'map-container push-out',
             uiOutput(paste0('map_date_slider_', id_str)),
+            uiOutput(paste0('heat_map_radio_', id_str)),
             uiOutput(paste0('scan_select_choices_', id_str)),
             leafletOutput(paste0('site_map_', id_str), width = '350px', height = '700px')
           )
@@ -288,6 +289,16 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     
   })
   
+  output[[ paste0('heat_map_radio_', id_str) ]] <- renderUI({
+    
+    radioButtons(paste0('heat_map_choice_', id_str),
+                 label = 'Display heat map',
+                 choices = c('Yes', 'No'),
+                 selected = 'No')
+    
+    
+  })
+  
   output[[ paste0('scan_select_choices_', id_str) ]] <- renderUI({
     
     req(input[[ paste0('map_date_', id_str) ]]) 
@@ -311,11 +322,13 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     req(input[[ paste0('selected_cultivar_', id_str) ]])
     req(input[[ paste0('selected_scan_', id_str) ]])
     req(input[[ paste0('map_date_', id_str) ]])
+    req(input[[ paste0('heat_map_choice_', id_str) ]])
     
     selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
     selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
     scan_name <- input[[ paste0('selected_scan_', id_str) ]]
     render_date <- input [[ paste0('map_date_', id_str) ]]
+    display_heat_map <- input[[ paste0('heat_map_choice_', id_str) ]]
     
     traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     
@@ -338,7 +351,7 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
                          scan_name,
                          '.tif')
     
-    render_site_map(traits, render_date, legend_title, image_path)
+    render_site_map(traits, render_date, legend_title, image_path, display_heat_map)
   })
 }
 
