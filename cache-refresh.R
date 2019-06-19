@@ -12,8 +12,10 @@ bety_src <- src_postgres(
  user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
 )
 
-cache_path <- "/srv/shiny-server/cache/cache.RData"
-cache_path_temp <- "/srv/shiny-server/cache/cache.RData.tmp"
+# create cache folder in same directory as this script (will do nothing if already exists)
+dir.create("./cache", showWarnings = FALSE)
+cache_path <- "./cache/cache.RData"
+cache_path_temp <- "./cache/cache.RData.tmp"
 
 # get all relevant data from BETYdb for a given subexperiment, write to cache file
 get_data_for_subexp <- function(subexp, exp_name) {
