@@ -7,7 +7,7 @@ library(cronR)
 library(shinythemes)
 library(scales)
 library(stringr)
-library(shinyWidgets)
+library(kableExtra)
 
 source('render-site-map.R')
 
@@ -33,9 +33,12 @@ load_cache <- function(full_cache_data) {
 }
 
 # directory containing full-field images
-image_dir <- 'data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs'
+image_dir <- '~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs'
+if(dir.exists(image_dir)){
 # dates that have full-field images
-image_dates <- as.Date(unique(unlist(str_extract_all(list.files(image_dir), '[0-9]{4}-[0-9]{2}-[0-9]{2}'))))
+  image_dates <- as.Date(unique(unlist(str_extract_all(list.files(image_dir),'[0-9]{4}-[0-9]{2}-[0-9]{2}'))))
+} 
+
   
 
 # set page UI
@@ -76,8 +79,7 @@ render_subexp_ui <- function(subexp_name, exp_name) {
         tabPanel('Map',
           div(class = 'map-container push-out',
             uiOutput(paste0('map_date_slider_', id_str)),
-            uiOutput(paste0('heat_map_radio_', id_str)),
-            uiOutput(paste0('scan_select_choices_', id_str)),
+            htmlOutput(paste0('scan_options_table_', id_str)),
             leafletOutput(paste0('site_map_', id_str), width = '350px', height = '700px')
           )
         )
@@ -275,43 +277,34 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
       traits <- subset(traits, cultivar_name == selected_cultivar)
     }
     
-
-    traits_dates <- image_dates[image_dates %in% as.Date(unique(traits$date))]
-    
     sliderInput(paste0('map_date_', id_str), 'Date',
-                min(traits_dates),
-                max(traits_dates),
-                max(traits_dates))
-    
-    sliderTextInput(inputId = paste0('map_date_', id_str),
-                    label = 'Date',
-                    choices = traits_dates)
+                min(as.Date(traits$date)),
+                max(as.Date(traits$date)),
+                min(as.Date(traits$date)))
     
   })
   
-  output[[ paste0('heat_map_radio_', id_str) ]] <- renderUI({
-    
-    radioButtons(paste0('heat_map_choice_', id_str),
-                 label = 'Display heat map',
-                 choices = c('Yes', 'No'),
-                 selected = 'No')
-    
-    
-  })
+  output[[ paste0('scan_options_table_', id_str) ]] <- renderText({
   
-  output[[ paste0('scan_select_choices_', id_str) ]] <- renderUI({
-    
     req(input[[ paste0('map_date_', id_str) ]]) 
     render_date <- input[[ paste0('map_date_', id_str) ]]
     
-    image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
-    image_scan <- unlist(str_match_all(image_paths, 'rgb_fullfield_L2_ua-mac_[0-9]{4}-[0-9]{2}-[0-9]{2}_(.*)\\.tif'))
-    
-    scan_options <- as.list(image_scan[-grep('\\.tif', image_scan)])
-    
-    radioButtons(paste0('selected_scan_', id_str),
-                 'Scan choices',
-                 choices = scan_options)
+    if(dir.exists(image_dir)){
+      
+      # display scan options if selected date has/have fullfield images
+      if(render_date %in% image_dates){
+        image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
+        image_scan <- unlist(str_match_all(image_paths,
+                                           'rgb_fullfield_L2_ua-mac_[0-9]{4}-[0-9]{2}-[0-9]{2}_(.*)_rgb_thumb\\.tif'))
+        scan_options <- image_scan[-grep('\\.tif', image_scan)]
+        scan_options_clean <- str_replace_all(scan_options, '_', ' ')
+        scan_options_df <- data.frame(scan_number = 1:length(scan_options_clean),
+                                      scan_name = scan_options_clean)
+        scan_options_kable <- kable(scan_options_df) %>% kable_styling()
+      }
+    }else{
+      return()
+    }
     
   })
   
@@ -320,38 +313,33 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     
     req(input[[ paste0('selected_variable_', id_str) ]])
     req(input[[ paste0('selected_cultivar_', id_str) ]])
-    req(input[[ paste0('selected_scan_', id_str) ]])
     req(input[[ paste0('map_date_', id_str) ]])
-    req(input[[ paste0('heat_map_choice_', id_str) ]])
     
     selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
     selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
-    scan_name <- input[[ paste0('selected_scan_', id_str) ]]
     render_date <- input [[ paste0('map_date_', id_str) ]]
-    display_heat_map <- input[[ paste0('heat_map_choice_', id_str) ]]
     
     traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     
     if (selected_cultivar != 'None'){
       traits <- subset(traits, cultivar_name == selected_cultivar)
     }
-      
+    
     
     units <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
     if (units != '') {
       units <- paste0('(', units, ')')
     }
-      
+    
     legend_title <- paste0(selected_variable, ' ', units)
     
-    image_path <- paste0(image_dir,
-                         '/rgb_fullfield_L2_ua-mac_',
-                         render_date,
-                         '_',
-                         scan_name,
-                         '.tif')
+    if(dir.exists(image_dir) & (render_date %in% image_dates)){
+      image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
+      render_site_map(traits, render_date, legend_title, image_paths, image_dir)
+    }else{
+      render_site_map(traits, render_date, legend_title)
+    }
     
-    render_site_map(traits, render_date, legend_title, image_path, display_heat_map)
   })
 }
 
