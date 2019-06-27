@@ -137,11 +137,12 @@ Shiny server: see https://www.rstudio.com/products/shiny/download-server/
 - cronR
 - stringr
 - kableExtra
+- raster
 - mapview
 - sf
 
 ```r
-lapply(list('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR', 'stringr', 'kableExtra', 'mapview', 'sf'),
+lapply(list('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR', 'stringr', 'kableExtra', 'raster', 'mapview', 'sf'),
        install.packages)
 ```
 

@@ -1,5 +1,6 @@
 library(rgeos)
 library(dplyr)
+library(raster)
 library(mapview)
 library(sf)
 
