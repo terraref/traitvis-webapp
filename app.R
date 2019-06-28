@@ -333,9 +333,11 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     
     legend_title <- paste0(selected_variable, ' ', units)
     
-    if(dir.exists(image_dir) & (render_date %in% image_dates)){
-      image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
-      render_site_map(traits, render_date, legend_title, image_paths, image_dir)
+    if(dir.exists(image_dir)){
+      if(render_date %in% image_dates){
+        image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
+        render_site_map(traits, render_date, legend_title, image_paths, image_dir)
+      }
     }else{
       render_site_map(traits, render_date, legend_title)
     }
