@@ -11,7 +11,9 @@ library(kableExtra)
 
 source('render-site-map.R')
 
-cache_path <- "/srv/shiny-server/cache/cache.RData"
+# create cache folder in same directory as this script (will do nothing if already exists)
+dir.create("./cache", showWarnings = FALSE)
+cache_path <- "./cache/cache.RData"
 cache_mod_time <- file.mtime(cache_path)
 full_cache_data <- NA
 

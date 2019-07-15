@@ -12,9 +12,12 @@ bety_src <- src_postgres(
  user     = ifelse(Sys.getenv('bety_user')     == '', 'bety', Sys.getenv('bety_user'))
 )
 
+<<<<<<< HEAD
 # with ssh -Nf -L 5432:bety:5432 bety6.ncsa.illinois.edu:
 #    user = viewer and pass = DelchevskoOro
 
+=======
+>>>>>>> upstream/master
 # create cache folder in same directory as this script (will do nothing if already exists)
 dir.create("./cache", showWarnings = FALSE)
 cache_path <- "./cache/cache.RData"
