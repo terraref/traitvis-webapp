@@ -30,7 +30,7 @@ get_data_for_subexp <- function(subexp, exp_name) {
     filter(experiment_id == subexp[[ 'id' ]]) %>%
     select(site_id) %>%
     unlist(use.names = FALSE)
-  if (is.null(site_ids)){
+  if (length(site_ids) == 0){
     return()
   }
   
