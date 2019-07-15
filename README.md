@@ -146,12 +146,6 @@ lapply(list('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 
        install.packages)
 ```
 
-#### Download image thumbnails
-
-Thumbnails to be displayed under heatmap can be downloaded from the `/ua-mac/Level_2/rgb_fullfield/_thumbs/` endpoint on [Globus](https://www.globus.org/).
-
-These thumbs should be saved to the following path in your home directory `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
-
 #### Deploy
 
 ```r
@@ -162,3 +156,8 @@ shiny::runGitHub(repo = 'reference-data',
                  )
 ```
 
+### Download image thumbnails
+
+Thumbnails to be displayed under heatmap can be downloaded from the `/ua-mac/Level_2/rgb_fullfield/_thumbs/` endpoint on [Globus](https://www.globus.org/).
+
+These thumbs should be saved to the following path in your home directory `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
