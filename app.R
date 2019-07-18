@@ -317,10 +317,23 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
   lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, experiment_name, input, output, full_cache_data[[ experiment_name ]])
 }
 
-server <- function(input, output) {
-  
+server <- function(input, output, session) {
   # load 'full_cache_data' object from cache file
   full_cache_data <- load_cache(full_cache_data)
+  
+  observe({
+    query <- parseQueryString(session$clientData$url_search)
+    if (!is.null(query[['season']])) {
+      current_season = query[['season']]
+      message <- c("new season", current_season)
+      if (!is.null(query[['product']])){
+        current_product <- query[['product']]
+        new_message <- c("new product", current_product)
+        message <- c(message, new_message)
+      }
+      cat(file=stderr(), message, "\n")
+    } 
+  })
 
   # render UI for all available experiments
   output$page_content <- renderUI({
