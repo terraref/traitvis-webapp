@@ -384,8 +384,10 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
 
 server <- function(input, output) {
   
-   # load 'full_cache_data' object from cache file
-   full_cache_data <- load_cache(full_cache_data)
+  # load 'full_cache_data' object from cache file
+  full_cache_data <- load_cache(full_cache_data)
+  
+  
   
   # render UI for all available experiments
   output$page_content <- renderUI({
