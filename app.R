@@ -78,13 +78,15 @@ render_subexp_ui <- function(subexp_name, exp_name) {
           uiOutput(paste0('mgmt_select_info_', id_str)),
           timevisOutput(paste0('mgmt_timeline_', id_str))
         ),
-        tabPanel('Map',
-          div(class = 'map-container push-out',
-            uiOutput(paste0('map_date_slider_', id_str)),
-            htmlOutput(paste0('scan_options_table_', id_str)),
-            leafletOutput(paste0('site_map_', id_str), width = '350px', height = '700px')
+        if(subexp_name != 'Drought Tolerance' & exp_name != 'Danforth Sorghum Pilot'){
+          tabPanel('Map',
+                   div(class = 'map-container push-out',
+                       uiOutput(paste0('map_date_slider_', id_str)),
+                       htmlOutput(paste0('scan_options_table_', id_str)),
+                       leafletOutput(paste0('site_map_', id_str), width = '350px', height = '700px')
+                   )
           )
-        )
+        }
       )
     )
   )
@@ -291,19 +293,19 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     req(input[[ paste0('map_date_', id_str) ]]) 
     render_date <- input[[ paste0('map_date_', id_str) ]]
     
-    if(dir.exists(image_dir)){
+    # display scan options table for selected date if thumbs exist for date
+    if(dir.exists(image_dir) & (render_date %in% image_dates)){
       
-      # display scan options if selected date has/have fullfield images
-      if(render_date %in% image_dates){
-        image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
-        image_scan <- unlist(str_match_all(image_paths,
+      image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
+      scan_matches <- unlist(str_match_all(image_paths,
                                            'rgb_fullfield_L2_ua-mac_[0-9]{4}-[0-9]{2}-[0-9]{2}_(.*)_rgb_thumb\\.tif'))
-        scan_options <- image_scan[-grep('\\.tif', image_scan)]
-        scan_options_clean <- str_replace_all(scan_options, '_', ' ')
-        scan_options_df <- data.frame(scan_number = 1:length(scan_options_clean),
-                                      scan_name = scan_options_clean)
-        scan_options_kable <- kable(scan_options_df) %>% kable_styling()
-      }
+      scan_names <- str_replace_all(scan_matches[-grep('\\.tif', scan_matches)],
+                                    '_',
+                                    ' ')
+      scan_names_df <- data.frame(scan_number = 1:length(scan_names),
+                                  scan_name = scan_names)
+      scan_names_kable <- kable(scan_names_df) %>% kable_styling()
+      
     }else{
       return()
     }
@@ -335,11 +337,9 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     
     legend_title <- paste0(selected_variable, ' ', units)
     
-    if(dir.exists(image_dir)){
-      if(render_date %in% image_dates){
-        image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
-        render_site_map(traits, render_date, legend_title, image_paths, image_dir)
-      }
+    if(dir.exists(image_dir) & (render_date %in% image_dates)){
+      overlay_image = 1
+      render_site_map(traits, render_date, legend_title, overlay_image)
     }else{
       render_site_map(traits, render_date, legend_title)
     }
@@ -367,8 +367,13 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
     render_timeline_hover(subexp_name, id_str, input, output, full_cache_data)
     
   }
-
-  render_map(subexp_name, id_str, input, output, full_cache_data)
+  
+  if(subexp_name != 'Drought Tolerance' & exp_name != 'Danforth Sorghum Pilot'){
+    
+    render_map(subexp_name, id_str, input, output, full_cache_data)
+    
+  }
+  
 }
 
 render_experiment_output <- function(experiment_name, input, output, full_cache_data) {
@@ -377,8 +382,8 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
 
 server <- function(input, output) {
   
-  # load 'full_cache_data' object from cache file
-  full_cache_data <- load_cache(full_cache_data) 
+   # load 'full_cache_data' object from cache file
+   full_cache_data <- load_cache(full_cache_data) 
   
   # render UI for all available experiments
   output$page_content <- renderUI({
