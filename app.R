@@ -36,6 +36,7 @@ load_cache <- function(full_cache_data) {
 
 # directory containing full-field images
 image_dir <- '~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs'
+
 if(dir.exists(image_dir)){
 # dates that have full-field images
   image_dates <- as.Date(unique(unlist(str_extract_all(list.files(image_dir),'[0-9]{4}-[0-9]{2}-[0-9]{2}'))))
@@ -282,9 +283,9 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     }
     
     sliderInput(paste0('map_date_', id_str), 'Date',
-                min(as.Date(traits$date)),
-                max(as.Date(traits$date)),
-                min(as.Date(traits$date)))
+                as.Date(full_cache_data[[ subexp_name ]][[ 'start_date']]),
+                as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]),
+                as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]))
     
   })
   
@@ -338,6 +339,7 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     legend_title <- paste0(selected_variable, ' ', units)
     
     if(dir.exists(image_dir) & (render_date %in% image_dates)){
+      # render site map with fullfield image if thumbs available for selected date
       overlay_image = 1
       render_site_map(traits, render_date, legend_title, overlay_image)
     }else{
@@ -383,7 +385,7 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
 server <- function(input, output) {
   
    # load 'full_cache_data' object from cache file
-   full_cache_data <- load_cache(full_cache_data) 
+   full_cache_data <- load_cache(full_cache_data)
   
   # render UI for all available experiments
   output$page_content <- renderUI({
