@@ -297,7 +297,7 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     # display scan options table for selected date if thumbs exist for date
     if(dir.exists(image_dir) & (render_date %in% image_dates)){
       
-      image_paths <- grep(render_date, list.files(image_dir), value = TRUE)
+      image_paths <- list.files(image_dir, pattern = as.character(render_date))
       scan_matches <- unlist(str_match_all(image_paths,
                                            'rgb_fullfield_L2_ua-mac_[0-9]{4}-[0-9]{2}-[0-9]{2}_(.*)_rgb_thumb\\.tif'))
       scan_names <- str_replace_all(scan_matches[-grep('\\.tif', scan_matches)],
