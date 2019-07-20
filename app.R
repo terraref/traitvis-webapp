@@ -6,6 +6,8 @@ library(leaflet)
 library(cronR)
 library(shinythemes)
 library(scales)
+library(stringr)
+library(kableExtra)
 
 source('render-site-map.R')
 
@@ -31,6 +33,16 @@ load_cache <- function(full_cache_data) {
         return(full_cache_data)
     }
 }
+
+# directory containing full-field images
+image_dir <- '~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs'
+
+if(dir.exists(image_dir)){
+# dates that have full-field images
+  image_dates <- as.Date(unique(unlist(str_extract_all(list.files(image_dir),'[0-9]{4}-[0-9]{2}-[0-9]{2}'))))
+} 
+
+  
 
 # set page UI
 ui <- fluidPage(theme = shinytheme('flatly'),
@@ -67,12 +79,15 @@ render_subexp_ui <- function(subexp_name, exp_name) {
           uiOutput(paste0('mgmt_select_info_', id_str)),
           timevisOutput(paste0('mgmt_timeline_', id_str))
         ),
-        tabPanel('Map',
-          div(class = 'map-container push-out',
-            uiOutput(paste0('map_date_slider_', id_str)),
-            leafletOutput(paste0('site_map_', id_str), width = '600px', height = '600px')
+        if(subexp_name != 'Drought Tolerance' & exp_name != 'Danforth Sorghum Pilot'){
+          tabPanel('Map',
+                   div(class = 'map-container push-out',
+                       uiOutput(paste0('map_date_slider_', id_str)),
+                       htmlOutput(paste0('scan_options_table_', id_str)),
+                       leafletOutput(paste0('site_map_', id_str), width = '350px', height = '700px')
+                   )
           )
-        )
+        }
       )
     )
   )
@@ -254,10 +269,48 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   # render slider input from dates in a given subexperiment
   output[[ paste0('map_date_slider_', id_str) ]] <- renderUI({
-    sliderInput(paste0('map_date_', id_str), 'Date', 
-                as.Date(full_cache_data[[ subexp_name ]][[ 'start_date']]), 
+    
+    req(input[[ paste0('selected_variable_', id_str) ]]) 
+    req(input[[ paste0('selected_cultivar_', id_str) ]])
+    
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]] 
+    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
+    
+    traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    
+    if (selected_cultivar != 'None'){
+      traits <- subset(traits, cultivar_name == selected_cultivar)
+    }
+    
+    sliderInput(paste0('map_date_', id_str), 'Date',
+                as.Date(full_cache_data[[ subexp_name ]][[ 'start_date']]),
                 as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]),
                 as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]))
+    
+  })
+  
+  output[[ paste0('scan_options_table_', id_str) ]] <- renderText({
+  
+    req(input[[ paste0('map_date_', id_str) ]]) 
+    render_date <- input[[ paste0('map_date_', id_str) ]]
+    
+    # display scan options table for selected date if thumbs exist for date
+    if(dir.exists(image_dir) & (render_date %in% image_dates)){
+      
+      image_paths <- list.files(image_dir, pattern = as.character(render_date))
+      scan_matches <- unlist(str_match_all(image_paths,
+                                           'rgb_fullfield_L2_ua-mac_[0-9]{4}-[0-9]{2}-[0-9]{2}_(.*)_rgb_thumb\\.tif'))
+      scan_names <- str_replace_all(scan_matches[-grep('\\.tif', scan_matches)],
+                                    '_',
+                                    ' ')
+      scan_names_df <- data.frame(scan_number = 1:length(scan_names),
+                                  scan_name = scan_names)
+      scan_names_kable <- kable(scan_names_df) %>% kable_styling()
+      
+    }else{
+      return()
+    }
+    
   })
   
   # render heat map of sites from trait records in a given subexperiment, for the selected date, variable and cultivar
@@ -276,16 +329,23 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     if (selected_cultivar != 'None'){
       traits <- subset(traits, cultivar_name == selected_cultivar)
     }
-      
+    
     
     units <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
     if (units != '') {
       units <- paste0('(', units, ')')
     }
-      
+    
     legend_title <- paste0(selected_variable, ' ', units)
     
-    render_site_map(traits, render_date, legend_title)
+    if(dir.exists(image_dir) & (render_date %in% image_dates)){
+      # render site map with fullfield image if thumbs available for selected date
+      overlay_image = 1
+      render_site_map(traits, render_date, legend_title, overlay_image)
+    }else{
+      render_site_map(traits, render_date, legend_title)
+    }
+    
   })
 }
 
@@ -309,8 +369,13 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
     render_timeline_hover(subexp_name, id_str, input, output, full_cache_data)
     
   }
-
-  render_map(subexp_name, id_str, input, output, full_cache_data)
+  
+  if(subexp_name != 'Drought Tolerance' & exp_name != 'Danforth Sorghum Pilot'){
+    
+    render_map(subexp_name, id_str, input, output, full_cache_data)
+    
+  }
+  
 }
 
 render_experiment_output <- function(experiment_name, input, output, full_cache_data) {
@@ -321,7 +386,7 @@ server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
   full_cache_data <- load_cache(full_cache_data)
-
+  
   # render UI for all available experiments
   output$page_content <- renderUI({
     subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)

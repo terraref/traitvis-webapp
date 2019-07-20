@@ -26,17 +26,19 @@ get_data_for_subexp <- function(subexp, exp_name) {
   subexp_data <- list(start_date = subexp[[ 'start_date' ]], end_date = subexp[[ 'end_date' ]])
   
   site_ids <- tbl(bety_src, 'experiments_sites') %>% 
+    collect() %>% 
     filter(experiment_id == subexp[[ 'id' ]]) %>%
     select(site_id) %>%
-    collect() %>% unlist(use.names = FALSE)
-  if (is.null(site_ids)){
+    unlist(use.names = FALSE)
+  if (length(site_ids) == 0){
     return()
   }
   
   # only use trait records associated with the relevant sites
   traits_table <- tbl(bety_src, 'traits', n = Inf) %>%
-    filter(date >= subexp[[ 'start_date' ]] & date <= subexp[[ 'end_date' ]] & checked >= 0) %>%
     filter(site_id %in% site_ids) %>%
+    collect() %>% 
+    filter(date >= subexp[[ 'start_date' ]] & date <= subexp[[ 'end_date' ]] & checked >= 0) %>%
     select(date, mean, variable_id, cultivar_id, treatment_id, site_id, method_id)
   
   n_traits <- traits_table %>% summarize(n = n()) %>% collect(n = Inf)
@@ -64,13 +66,14 @@ get_data_for_subexp <- function(subexp, exp_name) {
     
   
   traits <- traits_table %>% 
-    left_join(sites_table, by = 'site_id') %>%
-    left_join(cultivars_table, by = 'cultivar_id') %>% 
-    left_join(methods_table, by = 'method_id')
+    left_join(collect(sites_table), by = 'site_id') %>%
+    left_join(collect(cultivars_table), by = 'cultivar_id') %>% 
+    left_join(collect(methods_table), by = 'method_id')
   
   
   variables <- tbl(bety_src, 'variables') %>%
-    rename(variable_id = id)  %>% 
+    rename(variable_id = id)  %>%
+    collect() %>% 
     semi_join(traits, by = 'variable_id')
   
   variable_ids <- variables %>% select(variable_id) %>% collect
@@ -93,20 +96,22 @@ get_data_for_subexp <- function(subexp, exp_name) {
     # subset trait data by variable
     trait_data[[ variable_name ]] <- variable_data
   }
+  
   # save trait data for all variables
   subexp_data[[ 'trait_data' ]] <- trait_data
   
   # only use management records associated with the relevant treatments
   management_ids <- tbl(bety_src, 'managements_treatments') %>%
+    collect() %>%
     semi_join(traits, by = 'treatment_id') %>%
-    collect() %>% unlist(use.names = FALSE)
+    unlist(use.names = FALSE)
   
   if (!is.null(management_ids)) {
     subexp_data[[ 'managements' ]] <- tbl(bety_src, 'managements') %>%
-    filter(date >= subexp[[ 'start_date' ]] & date <= subexp[[ 'end_date' ]]) %>%
-    filter(id %in% management_ids) %>%
-    select(id, date, mgmttype, notes) %>%
-    collect()
+      collect() %>% 
+      filter(date >= subexp[[ 'start_date' ]] & date <= subexp[[ 'end_date' ]]) %>%
+      filter(id %in% management_ids) %>%
+      select(id, date, mgmttype, notes)
   }
   
   # load existing full_cache_data object if exists, otherwise use empty list object
@@ -127,19 +132,20 @@ get_data_for_subexp <- function(subexp, exp_name) {
 
 # get data for each experiment by subexperiment
 get_data_for_exp <- function(exp_name, experiments) {
-  subexp = subset(experiments, gsub(":.*$","", name) == exp_name)
-  subexp[[ 'name' ]] = gsub(".*: ","", subexp[['name']])
+  subexp <- subset(experiments, gsub(":.*$","", name) == exp_name)
+  subexp[[ 'name' ]] <- gsub(".*: ","", subexp[['name']])
   apply(subexp, 1, get_data_for_subexp, exp_name)
 }
 
 # get all experiments in BETYdb
 experiments <- tbl(bety_src, 'experiments') %>% 
   select(id, name, start_date, end_date) %>% 
+  filter(!grepl('KSU', name)) %>% 
   collect() %>% as.data.frame()
 
 exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
 lapply(exp_names, get_data_for_exp, experiments)
-file.rename(cache_path_temp, cache_path)
-
+#file.rename(cache_path_temp, cache_path)
+file.copy(cache_path_temp, cache_path)
 message("Completed cache refresh properly.")
 
