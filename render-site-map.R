@@ -54,7 +54,11 @@ render_site_map <- function(traits, render_date, legend_title, overlay_image = 0
         scan_number <- which(full_image_paths == path)
         scan_name <- paste0('scan ', scan_number)
         fullfield_image <- brick(path)
-        map <- viewRGB(x = fullfield_image, map = map, layer.name = scan_name)
+        map <- viewRGB(x = fullfield_image, 
+                       r = 1, g = 2, b = 3,
+                       quantiles = NULL, 
+                       map = map, 
+                       layer.name = scan_name)
         map <- removeHomeButton(map@map)
       }
     }
