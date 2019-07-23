@@ -50,7 +50,7 @@ render_site_map <- function(traits, render_date, legend_title, overlay_image = 0
       
       image_dir <- '~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs'
       image_paths <- list.files(image_dir, pattern = as.character(render_date))
-      full_image_paths <- paste0(image_dir, '/', image_paths)
+      full_image_paths <- file.path(image_dir, image_paths)
       
       for(path in full_image_paths){
         scan_number <- which(full_image_paths == path)
