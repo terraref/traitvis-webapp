@@ -14,9 +14,9 @@ render_site_map <- function(selected_variable, traits, render_date, legend_title
     mutate(site_poly = st_as_sfc(geometry)) %>% 
     group_by(geometry) %>% 
     top_n(1, date) %>% 
-    mutate(hover_label = paste0('Cultivar: ',
+    mutate(hover_label = paste0('<p>Cultivar: ',
                                 cultivar_name,
-                                '<p>Plot: ',
+                                '</p><p>Plot: ',
                                 gsub('MAC Field Scanner Season [0-9]{1,2} ',
                                      '',
                                      sitename),
