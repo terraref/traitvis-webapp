@@ -3,6 +3,8 @@ library(dplyr)
 library(raster)
 library(mapview)
 library(sf)
+library(leafem)
+
 
 # render leaflet map from traits for a given date
 # overlay fullfield image if thumb avaiable for selected date
