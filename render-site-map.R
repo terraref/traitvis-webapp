@@ -8,14 +8,25 @@ library(leafem)
 
 # render leaflet map from traits for a given date
 # overlay fullfield image if thumb avaiable for selected date
-render_site_map <- function(traits, render_date, legend_title, overlay_image = 0) {
+render_site_map <- function(selected_variable, traits, render_date, legend_title, overlay_image = 0) {
   
   # get most recent traits for each site
   # convert each site's geometry to a sfc object # will coerce polygons into multipolygon
   latest_traits <- subset(traits, as.Date(date) <= render_date & !is.na(geometry)) %>% 
     mutate(site_poly = st_as_sfc(geometry)) %>% 
     group_by(geometry) %>% 
-    top_n(1, date) 
+    top_n(1, date) %>% 
+    mutate(hover_label = paste0('<p>Cultivar: ',
+                                cultivar_name,
+                                '</p><p>Plot: ',
+                                gsub('MAC Field Scanner Season [0-9]{1,2} ',
+                                     '',
+                                     sitename),
+                                '</p><p>',
+                                selected_variable, 
+                                ': ',
+                                mean,
+                                '</p>'))
 
   pal <- colorNumeric(
     palette = 'Greens',
@@ -34,7 +45,8 @@ render_site_map <- function(traits, render_date, legend_title, overlay_image = 0
                        opacity = 0,
                        fillColor = pal(latest_traits[[ 'mean' ]]),
                        fillOpacity = 0.8,
-                       group = 'Heat map')
+                       group = 'Heat map',
+                       label = lapply(latest_traits[[ 'hover_label' ]], HTML))
     
     map <- addLayersControl(map,
                             overlayGroups = "Heat map",

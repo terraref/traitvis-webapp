@@ -270,18 +270,6 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
   # render slider input from dates in a given subexperiment
   output[[ paste0('map_date_slider_', id_str) ]] <- renderUI({
     
-    req(input[[ paste0('selected_variable_', id_str) ]]) 
-    req(input[[ paste0('selected_cultivar_', id_str) ]])
-    
-    selected_variable <- input[[ paste0('selected_variable_', id_str) ]] 
-    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
-    
-    traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
-    
-    if (selected_cultivar != 'None'){
-      traits <- subset(traits, cultivar_name == selected_cultivar)
-    }
-    
     sliderInput(paste0('map_date_', id_str), 'Date',
                 as.Date(full_cache_data[[ subexp_name ]][[ 'start_date']]),
                 as.Date(full_cache_data[[ subexp_name ]][[ 'end_date' ]]),
@@ -340,10 +328,10 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
     
     if(dir.exists(image_dir) & (render_date %in% image_dates)){
       # render site map with fullfield image if thumbs available for selected date
-      overlay_image = 1
-      render_site_map(traits, render_date, legend_title, overlay_image)
+      overlay_image <- 1
+      render_site_map(selected_variable, traits, render_date, legend_title, overlay_image)
     }else{
-      render_site_map(traits, render_date, legend_title)
+      render_site_map(selected_variable, traits, render_date, legend_title)
     }
     
   })
