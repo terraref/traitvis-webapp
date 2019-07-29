@@ -143,7 +143,6 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
     data_max <- max(plot_data[[ 'mean' ]])
     
     units <- selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
-    title <- ifelse(units == '', selected_variable, paste0(selected_variable, ' (', units, ')'))
     
     unique_vals <- unique(plot_data[[ 'mean' ]])
     all_vals_integers <- all(unique_vals %% 1 == 0)
@@ -168,12 +167,14 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
       }
       
     if (selected_cultivar != 'None') {
-        title <- paste0(title, '\nCultivar ', selected_cultivar, ' in red')
+        title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in red')
         trait_plot <- trait_plot + 
           geom_point(data = subset(plot_data, cultivar_name == selected_cultivar), 
                      aes(x = as.Date(date), y = mean, group = site_id)) +
           geom_line(data = subset(plot_data, cultivar_name == selected_cultivar), 
                      size = 0.5, alpha = 0.5, aes(x = as.Date(date), y = mean, group = site_id)) 
+    } else {
+        title <- selected_variable
     }
     
     trait_plot + 
