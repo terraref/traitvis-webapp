@@ -319,20 +319,12 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
       traits <- subset(traits, cultivar_name == selected_cultivar)
     }
     
-    
-    units <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'units' ]]
-    if (units != '') {
-      units <- paste0('(', units, ')')
-    }
-    
-    legend_title <- paste0(selected_variable, ' ', units)
-    
     if(dir.exists(image_dir) & (render_date %in% image_dates)){
       # render site map with fullfield image if thumbs available for selected date
       overlay_image <- 1
-      render_site_map(selected_variable, traits, render_date, legend_title, overlay_image)
+      render_site_map(selected_variable, traits, render_date, selected_variable, overlay_image)
     }else{
-      render_site_map(selected_variable, traits, render_date, legend_title)
+      render_site_map(selected_variable, traits, render_date, selected_variable)
     }
     
   })
