@@ -44,7 +44,9 @@ RUN install2.r --error \
 
 RUN wget https://cran.r-project.org/src/contrib/leafem_0.0.1.tar.gz \
     && R CMD INSTALL leafem_0.0.1.tar.gz
-      
+
+RUN install2.r --error rgdal
+
 COPY . /srv/shiny-server/
 COPY shiny-server.conf /etc/shiny-server/
 RUN chown -R shiny:shiny /srv/shiny-server && \
