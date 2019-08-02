@@ -65,6 +65,8 @@ render_subexp_ui <- function(subexp_name, exp_name) {
       uiOutput(paste0('cultivar_select_', id_str))
     ),
      
+    textOutput(paste0('betydb_query_', id_str)),
+    
     uiOutput(paste0('plot_hover_info_', id_str)),
     
     mainPanel(class = 'main-panel',
@@ -125,6 +127,37 @@ render_cultivar_menu <- function(subexp_name, id_str, input, output, full_cache_
     selectInput(paste0('selected_cultivar_', id_str), 'Cultivar', c('None', unique_cultivars))
   })
 }
+
+# render betydb_query code from traits package for selected experiment and trait
+render_betydb_query <- function(exp_name, subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('betydb_query_', id_str) ]] <- renderText({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    
+    trait_name <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'name' ]]
+    
+    if(exp_name == 'Danforth Sorghum Pilot'){
+      site <- 'Danforth Plant Science Center Bellweather Phenotyping Facility'
+    }else{
+      site <- paste0('~', gsub('MAC ', '', exp_name))
+    }
+    
+    text_1 <- "betydb_query("
+    text_2 <- paste0("trait = '", trait_name, "', ")
+    text_3 <- paste0("sitename = '", site, "', ")
+    text_4 <- paste0("limit = 'none')")
+    
+    betydb_query <- paste0(text_1,
+                           text_2,
+                           text_3,
+                           text_4)
+    
+  })
+  
+}
+
 
 # render box plot time series from trait records in a given subexperiment, for the selected variable
 # if a cultivar is selected, render line plot from trait records for that cultivar
@@ -338,6 +371,8 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   render_variable_menu(subexp_name, id_str, output, full_cache_data)
   
   render_cultivar_menu(subexp_name, id_str, input, output, full_cache_data)
+  
+  render_betydb_query(exp_name, subexp_name, id_str, input, output, full_cache_data)
   
   render_trait_plot(subexp_name, id_str, input, output, full_cache_data)
   
