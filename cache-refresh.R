@@ -87,21 +87,23 @@ get_data_for_subexp <- function(subexp, exp_name) {
       select(variable_id, name, units, label) %>% collect
     
     variable_data[[ 'id' ]] <- variable_record %>% select(variable_id)
+    variable_data[[ 'name' ]] <- variable_record %>% select(name)
     variable_data[[ 'units' ]] <- variable_record %>% select(units)
     if(!variable_data[[ 'units' ]][[ 'units' ]]==''){
-      variable_name <- paste0(variable_record[[ 'label' ]],
-                              " (",
-                              variable_data[[ 'units' ]][[ 'units' ]],
-                              ")")
+      variable_label <- paste0(variable_record[[ 'label' ]],
+                               " (",
+                               variable_data[[ 'units' ]][[ 'units' ]],
+                               ")")
     }else{
-      variable_name <- variable_record[[ 'label' ]]
+      variable_label <- variable_record[[ 'label' ]]
     }
     
     variable_traits <- traits %>% filter(variable_id == curr_variable_id) %>% collect(n = Inf)
     variable_data[[ 'traits' ]] <- variable_traits
     
-    # subset trait data by variable
-    trait_data[[ variable_name ]] <- variable_data
+    # subset trait data by variable label
+    trait_data[[ variable_label ]] <- variable_data
+    
   }
   
   # save trait data for all variables
