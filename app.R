@@ -87,6 +87,10 @@ render_subexp_ui <- function(subexp_name, exp_name) {
                        leafletOutput(paste0('site_map_', id_str), width = '350px', height = '700px')
                    )
           )
+        }else{
+          tabPanel('Map',
+                   br(),
+                   'No map data available for Danforth Sorghum Pilot: Drought Tolerance')
         },
         tabPanel('Download',
                  htmlOutput(paste0('download_info_', id_str)))
