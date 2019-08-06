@@ -384,7 +384,7 @@ render_download_info <- function(exp_name, subexp_name, id_str, input, output, f
                       "trait=",
                       trait_name,
                       "&sitename=",
-                      gsub(' ', '_', site),
+                      site,
                       "&limit=none&key=YOUR_API_KEY</a>.<br><br>",
                       "See API <a href='https://www.betydb.org/api/docs/v1.html'>documentation</a> for details.")
     text_15 <- paste0("<hr>",
