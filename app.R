@@ -386,7 +386,7 @@ render_download_info <- function(exp_name, subexp_name, id_str, input, output, f
                       "&sitename=",
                       site,
                       "&limit=none&key=YOUR_API_KEY</a>.<br><br>",
-                      "See API <a href='https://www.betydb.org/api/docs/v1.html'>documentation</a> for details.")
+                      "See API <a href='https://www.betydb.org/api/docs'>documentation</a> for details.")
     text_15 <- paste0("<hr>",
                       "<h1 style='font-size:30px;'>TERRA REF Tutorials</h1><br>",
                       "For more detailed information on how to access data, take a look at our tutorials.<br><br>",
