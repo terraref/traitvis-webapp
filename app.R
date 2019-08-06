@@ -388,6 +388,7 @@ render_download_info <- function(exp_name, subexp_name, id_str, input, output, f
                       "&limit=none&key=YOUR_API_KEY</a>.")
     text_15 <- paste0("<hr>",
                       "<h1 style='font-size:30px;'>TERRA REF Tutorials</h1><br>",
+                      "For more detailed information on how to access data, take a look at our tutorials.<br><br>",
                       "GitHub repository: <a href='https://github.com/terraref/tutorials'>",
                       "https://github.com/terraref/tutorials</a><br>",
                       "How to access data using R traits package: ",
