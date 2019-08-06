@@ -384,7 +384,7 @@ render_download_info <- function(exp_name, subexp_name, id_str, input, output, f
                       "trait=",
                       trait_name,
                       "&sitename=",
-                      site,
+                      gsub(' ', '_', site),
                       "&limit=none&key=YOUR_API_KEY</a>.")
     text_15 <- paste0("<hr>",
                       "<h1 style='font-size:30px;'>TERRA REF Tutorials</h1><br>",
