@@ -64,8 +64,6 @@ render_subexp_ui <- function(subexp_name, exp_name) {
       uiOutput(paste0('variable_select_', id_str)),
       uiOutput(paste0('cultivar_select_', id_str))
     ),
-     
-    textOutput(paste0('betydb_query_', id_str)),
     
     uiOutput(paste0('plot_hover_info_', id_str)),
     
@@ -89,7 +87,9 @@ render_subexp_ui <- function(subexp_name, exp_name) {
                        leafletOutput(paste0('site_map_', id_str), width = '350px', height = '700px')
                    )
           )
-        }
+        },
+        tabPanel('Download',
+                 htmlOutput(paste0('download_info_', id_str)))
       )
     )
   )
@@ -127,37 +127,6 @@ render_cultivar_menu <- function(subexp_name, id_str, input, output, full_cache_
     selectInput(paste0('selected_cultivar_', id_str), 'Cultivar', c('None', unique_cultivars))
   })
 }
-
-# render betydb_query code from traits package for selected experiment and trait
-render_betydb_query <- function(exp_name, subexp_name, id_str, input, output, full_cache_data){
-  
-  output[[ paste0('betydb_query_', id_str) ]] <- renderText({
-    
-    req(input[[ paste0('selected_variable_', id_str) ]])
-    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
-    
-    trait_name <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'name' ]]
-    
-    if(exp_name == 'Danforth Sorghum Pilot'){
-      site <- 'Danforth Plant Science Center Bellweather Phenotyping Facility'
-    }else{
-      site <- paste0('~', gsub('MAC ', '', exp_name))
-    }
-    
-    text_1 <- "betydb_query("
-    text_2 <- paste0("trait = '", trait_name, "', ")
-    text_3 <- paste0("sitename = '", site, "', ")
-    text_4 <- paste0("limit = 'none')")
-    
-    betydb_query <- paste0(text_1,
-                           text_2,
-                           text_3,
-                           text_4)
-    
-  })
-  
-}
-
 
 # render box plot time series from trait records in a given subexperiment, for the selected variable
 # if a cultivar is selected, render line plot from trait records for that cultivar
@@ -363,6 +332,76 @@ render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
   })
 }
 
+render_download_info <- function(exp_name, subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('download_info_', id_str) ]] <- renderUI({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    
+    trait_name <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'name' ]]
+    
+    if(exp_name == 'Danforth Sorghum Pilot'){
+      site <- 'Danforth Plant Science Center Bellweather Phenotyping Facility'
+    }else{
+      site <- paste0('~', gsub('MAC ', '', exp_name))
+    }
+    
+    text_1 <- "<h1 style='font-size:30px;'>How to access data</h1>"
+    text_2 <- paste0("You can access <strong><em>",
+                     selected_variable,
+                     "</strong></em> data for <strong><em>",
+                     exp_name,
+                     "</strong></em>, using either:<br>")
+    text_3 <- "1.) BETYdb API<br>2.) R traits package"
+    text_4 <- "<br><h2 style='font-size:25px;'>API key</h2>"
+    text_5 <- paste0("Both methods will require an <strong>API key</strong>.<br><br>",
+                     "You can get an API key by signing up for the TERRA Ref BETYdb traits database. ",
+                     "Register for BETYdb at ",
+                     "<a href='https://terraref.ncsa.illinois.edu/bety/signup'>",
+                     "https://terraref.ncsa.illinois.edu/bety/signup</a>.<hr>")
+    text_6 <- "<h2 style='font-size:25px;'>R traits package</h2><br>"
+    text_7 <- "Install the traits package from CRAN using: <code>install.packages('traits')</code>.<br><br>"
+    text_8 <- paste0("You can then use the following chunk of R code to access the data: <br><br>",
+                     "<code>library(traits)</code><br><br>",
+                     "<code>options(betydb_url = ",
+                     "'https://terraref.ncsa.illinois.edu/bety/'",
+                     ", betydb_api_version = 'v1', ",
+                     "betydb_key = 'YOUR_API_KEY')</code><br><br>")
+    text_9 <- paste0("<code>",
+                     trait_name)
+    text_10 <- paste0(" <- betydb_query(trait = '", trait_name, "', ")
+    text_11 <- paste0("sitename = '", site, "', ")
+    text_12 <- paste0("limit = 'none')</code>")
+    text_13 <- paste0("<hr>",
+                      "<h2 style='font-size:25px;'>BETYdb API</h2><br>",
+                      "You can also access the data at this URL:<br>")
+    text_14 <- paste0("<a>https://terraref.ncsa.illinois.edu/bety/api/v1/search?",
+                      "trait=",
+                      trait_name,
+                      "&sitename=",
+                      site,
+                      "&limit=none&key=YOUR_API_KEY</a>.")
+    text_15 <- paste0("<hr>",
+                      "<h1 style='font-size:30px;'>TERRA REF Tutorials</h1><br>",
+                      "GitHub repository: <a href='https://github.com/terraref/tutorials'>",
+                      "https://github.com/terraref/tutorials</a><br>",
+                      "How to access data using R traits package: ",
+                      "<a href='https://github.com/terraref/tutorials/tree/master/traits/03-access-r-traits.Rmd'>",
+                      "traits/03-access-r-traits.Rmd</a><br>",
+                      "How to access data using BETYdb API: ",
+                      "<a href='https://github.com/terraref/tutorials/tree/master/traits/02-betydb-api-access.Rmd'>",
+                      "traits/02-betydb-api-access.Rmd</a><br>")
+    
+    download_text <- HTML(paste(text_1, text_2, text_3,
+                                text_4, text_5, text_6,
+                                text_7, text_8, text_9,
+                                text_10, text_11, text_12,
+                                text_13, text_14, text_15))
+  })
+  
+}
+
 # render outputs for a given subexperiment
 render_subexp_output <- function(subexp_name, exp_name, input, output, full_cache_data) {
   
@@ -371,8 +410,6 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   render_variable_menu(subexp_name, id_str, output, full_cache_data)
   
   render_cultivar_menu(subexp_name, id_str, input, output, full_cache_data)
-  
-  render_betydb_query(exp_name, subexp_name, id_str, input, output, full_cache_data)
   
   render_trait_plot(subexp_name, id_str, input, output, full_cache_data)
   
@@ -391,6 +428,8 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
     render_map(subexp_name, id_str, input, output, full_cache_data)
     
   }
+  
+  render_download_info(exp_name, subexp_name, id_str, input, output, full_cache_data)
   
 }
 
