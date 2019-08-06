@@ -370,7 +370,7 @@ render_download_info <- function(exp_name, subexp_name, id_str, input, output, f
                      "<code>library(traits)</code><br><br>",
                      "<code>options(betydb_url = ",
                      "'https://terraref.ncsa.illinois.edu/bety/'",
-                     ", betydb_api_version = 'v1', ",
+                     ", betydb_api_version = 'beta', ",
                      "betydb_key = 'YOUR_API_KEY')</code><br><br>")
     text_9 <- paste0("<code>",
                      trait_name)
