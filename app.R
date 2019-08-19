@@ -275,6 +275,10 @@ render_variable_table <- function(subexp_name, id_str, input, output, full_cache
                             caption = 'Variable information') %>% 
       kable_styling(bootstrap_options = 'hover')
     
+    variable_kable_updated <- column_spec(variable_kable,
+                                          column = 1,
+                                          width = '10cm')
+    
   })
   
 }
@@ -307,6 +311,10 @@ render_method_table <- function(subexp_name, id_str, input, output, full_cache_d
                           escape = FALSE,
                           caption = 'Method information') %>% 
       kable_styling(bootstrap_options = 'hover')
+    
+    method_kable_updated <- column_spec(method_kable,
+                                        column = 1,
+                                        width = '10cm')
     
   })
   
