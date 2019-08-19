@@ -76,6 +76,9 @@ render_subexp_ui <- function(subexp_name, exp_name) {
                         hover = hoverOpts(id = paste0('plot_hover_', id_str)))
           ),
           hr(),
+          htmlOutput(paste0('variable_table_', id_str)),
+          htmlOutput(paste0('method_table_', id_str)),
+          hr(),
           uiOutput(paste0('mgmt_select_info_', id_str)),
           timevisOutput(paste0('mgmt_timeline_', id_str))
         ),
@@ -243,6 +246,70 @@ render_plot_hover <- function(subexp_name, id_str, input, output, full_cache_dat
       ))
     )
   })
+}
+
+# render table containing variable name and link to BETYdb variable page
+render_variable_table <- function(subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('variable_table_', id_str) ]] <- renderText({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    req(input[[ paste0('selected_cultivar_', id_str) ]])
+    
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
+    
+    variable_name <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'name' ]]
+    variable_id <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'id' ]]
+    
+    variable_df <- data.frame('name' = variable_name,
+                              'BETYdb link' = text_spec(paste0( "https://terraref.ncsa.illinois.edu/bety/variables/",
+                                                                variable_id),
+                                                        link = paste0("https://terraref.ncsa.illinois.edu/bety/variables/",
+                                                                      variable_id)),
+                              check.names = FALSE)
+    
+    variable_kable <- kable(variable_df,
+                            format = 'html',
+                            escape = FALSE,
+                            caption = 'Variable information') %>% 
+      kable_styling(bootstrap_options = 'hover')
+    
+  })
+  
+}
+
+# render table containing method name and link to BETYdb method page
+render_method_table <- function(subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('method_table_', id_str) ]] <- renderText({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    req(input[[ paste0('selected_cultivar_', id_str) ]])
+    
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
+    
+    traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    
+    method_names <- unique(traits$method)
+    method_ids <- unique(traits$method_id)
+    
+    method_df <- data.frame('name' = method_names,
+                            'BETYdb link' = text_spec(paste0( "https://terraref.ncsa.illinois.edu/bety/methods/",
+                                                              method_ids),
+                                                      link = paste0("https://terraref.ncsa.illinois.edu/bety/methods/",
+                                                                    method_ids)),
+                            check.names = FALSE)
+    
+    method_kable <- kable(method_df,
+                          format = 'html',
+                          escape = FALSE,
+                          caption = 'Method information') %>% 
+      kable_styling(bootstrap_options = 'hover')
+    
+  })
+  
 }
 
 # render info box for date, type, and notes of selected (clicked) timeline item
@@ -420,6 +487,10 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   render_trait_plot(subexp_name, id_str, input, output, full_cache_data)
   
   render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
+  
+  render_variable_table(subexp_name, id_str, input, output, full_cache_data)
+  
+  render_method_table(subexp_name, id_str, input, output, full_cache_data)
   
   if (!is.null(full_cache_data[[ subexp_name ]][[ 'managements' ]])) {
     
