@@ -2,9 +2,51 @@
 
 Time series box, line plots and heatmaps for every available season
 
-## Installation
 
-### Easy deploy with Docker
+### Set up a local development environment
+
+#### Database connection
+
+This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.
+
+You can connect to a local instance of a BETYdb database using the TERRA-REF BRAPI API. You will need to clone the [terraref/brapi github repository](https://github.com/terraref/brapi) and run some Docker commands to create a connection. 
+
+Clone terraref/brapi repository:
+
+```sh
+git clone https://github.com/terraref/brapi.git
+cd brapi
+```
+
+Within the brapi folder, you will need to create a `docker-compose.override.yml` to expose a port on your local machine. The following chunk will expose port 5433 and should be added to the file:
+
+```sh
+version: '3'
+services:
+  postgres:
+    ports:
+      - '5433:5432'
+```
+
+Initialize the database:
+
+```sh
+docker-compose up -d postgres
+docker-compose run --rm bety initialize
+docker-compose run --rm bety sync
+```
+
+### R packages
+
+This application requires the following R packages to be installed: `shiny`, `shinythemes`, `scales`, `lubridate`, `dplyr`, `ggplot2`, `timevis`, `rgeos`, `leaflet`, `cronR`, `stringr`, `kableExtra`, `raster`, `mapview`, `leafem`, and `sf`.
+
+### Download image thumbnails
+
+Thumbnails to be displayed under heatmap can be downloaded from the `/ua-mac/Level_2/rgb_fullfield/_thumbs/` endpoint on [Globus](https://www.globus.org/).
+
+These thumbs should be saved to the following path in your home directory `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
+
+## Deploy application using Docker
 
 ```sh
 git clone https://github.com/terraref/traitvis-webapp
@@ -28,136 +70,3 @@ docker run --rm -t -i shiny-traits /bin/bash
 ```
 
 The shiny-server.conf file is used to increase the default timeout to avoid errors on initialization if BETYdb is taking time to load.
-
-### Database Connection
-
-This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.
-
-Connection parameters can be set as environment variables. By default they are:
-
-```
-bety_dbname   = bety
-bety_password = SECRET
-bety_host     = bety6.ncsa.illinois.edu
-bety_port     = 5432
-bety_user     = viewer
-```
-
-There are three methods that you can use access to the TERRAREF instance of BETYdb:
-
-1. If running on the NCSA Nebula cluster within the terraref domain, can be accessed by setting the environment variable `bety_host=bety6`
-    1. This can be done within the NDS Workbench at terraref.ndslabs.org
-2. Otherwise, use an ssh tunnel. Developers can get ssh access to the TERRA REF database server, you can [request here](https://identity.ncsa.illinois.edu/join/TU49BUUEDM) and the connect with
-    ```sh
-    ssh -Nf -L 5432:localhost:5432 bety6.ncsa.illinois.edu
-    ```    
-3. Install a local instance of BETYdb
-    ```sh
-    load.bety.sh -c -u -m 99 -r 0 -w https://terraref.ncsa.illinois.edu/bety/dump/bety0/bety.tar.gz
-    load.bety.sh -m 99 -r 6 -w https://terraref.ncsa.illinois.edu/bety/dump/bety6/bety.tar.gz
-    ```
-
-#### Deploy Updates on Nebula / Kubernetes
-
-After updating the master branch on GitHub, a new Docker image is built on [Docker hub](https://hub.docker.com/r/terraref/traitvis-webapp/builds/). The following commands can be used to deploy and inspect this app as it is being served at traitvis.workbench.org
-
-Login to server (requires authentication)
-
-```sh
-ssh core@282.284.420.38 # = ip x 2
-```
-
-See what is running in the terraref namespace, including extractors and traitvis
-
-```sh
-kubectl get pods --namespace=terraref
-``` 
-
-
-The following restarts the container, which triggers the most recent image from [docker hub](https://hub.docker.com/r/terraref/traitvis-webapp/builds/) to be downloaded. 
-
-```sh
-kubectl delete pod terraref-traitvis-xxxx --namespace=terraref
-#xxxx is a random string.
-``` 
-
-
-Show status (i.e. ContainerCreating, Running, etc)
-
-```sh
-kubectl get pods --namespace=terraref
-```
-
-to see logs:
-
-```sh
-kubectl logs -f terraref-traitvis-xxxx --namespace=terraref
-```
-
-
-to get an interactive terminal 
-
-```sh
-kubectl --namespace=terraref exec -it terraref-traitvis-xxxx bash
-```
-
-### Configuring a Server
-
-This is the manual version of what is automated using Docker.
-
-#### System Dependencies
-
-##### OSX 
-
-```sh
-brew install geos
-```
-
-##### Ubuntu 
-
-cron (Ubuntu)
-
-```sh
-apt-get update
-apt-get install cron
-```
-
-Shiny server: see https://www.rstudio.com/products/shiny/download-server/
-
-#### R packages
-
-- shiny
-- shinythemes
-- lubridate
-- dplyr
-- ggplot2
-- timevis
-- rgeos
-- leaflet
-- cronR
-- stringr
-- kableExtra
-- raster
-- mapview
-- leafem
-- sf
-
-```r
-install.packages(c('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR', 'stringr', 'kableExtra', 'raster', 'mapview', 'leafem', 'sf'))
-```
-
-#### Deploy
-
-```r
-shiny::runGitHub(repo = 'reference-data', 
-                 username= 'terraref', 
-                 subdir = 'experiment-trait-data-visualizer',
-                 launch.browser = FALSE
-                 )
-```
-
-### Download image thumbnails
-
-Thumbnails to be displayed under heatmap can be downloaded from the `/ua-mac/Level_2/rgb_fullfield/_thumbs/` endpoint on [Globus](https://www.globus.org/).
-
-These thumbs should be saved to the following path in your home directory `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
