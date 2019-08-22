@@ -36,11 +36,11 @@ docker-compose run --rm bety initialize
 docker-compose run --rm bety sync
 ```
 
-### R packages
+#### R packages
 
 This application requires the following R packages to be installed: `shiny`, `shinythemes`, `scales`, `lubridate`, `dplyr`, `ggplot2`, `timevis`, `rgeos`, `leaflet`, `cronR`, `stringr`, `kableExtra`, `raster`, `mapview`, `leafem`, and `sf`.
 
-### Download image thumbnails
+#### Download image thumbnails
 
 Fullfield image thumbnails are available to be displayed under heatmaps. These thumbnails can be downloaded from the `/ua-mac/Level_2/rgb_fullfield/_thumbs/` endpoint on [Globus](https://www.globus.org/).
 
