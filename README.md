@@ -46,7 +46,32 @@ Fullfield image thumbnails are available to be displayed under heatmaps. These t
 
 These thumbs should be saved to the following path in your home directory `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
 
-## Deploy application using Docker
+#### How to run Shiny Application
+
+You will need to clone the [terraref/traitvis](https://github.com/terraref/traitvis-webapp) repository.
+
+```sh
+git clone https://github.com/terraref/traitvis-webapp.git
+cd traitvis-webapp
+```
+
+The `cache-refresh.R` script will need to be run and requires a database connection. Default connection parameters have been set, but the following environment variables should be set to connect to the local instance of BETYdb set up above.
+
+In your R console, run the following commands to set connection parameters and run the cache-refresh script:
+
+```sh
+Sys.setenv(bety_host = 'localhost')
+Sys.setenv(bety_port = '5433')
+source('cache-refresh.R')
+```
+
+Once the cache-refresh script has been run, open up the `app.R` script. Start up the application using the following R command:
+
+```sh
+shiny::runAPP()
+```
+
+### Deploy application using Docker
 
 ```sh
 git clone https://github.com/terraref/traitvis-webapp
