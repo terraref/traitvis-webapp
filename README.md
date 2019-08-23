@@ -65,7 +65,9 @@ Sys.setenv(bety_port = '5433')
 source('cache-refresh.R')
 ```
 
-Once the cache-refresh script has been run, open up the `app.R` script. Start up the application using the following R command:
+Once the cache-refresh script has been run, a `cache` folder containing a `cache.RData` file should be created.
+
+Next, start up the application running the following command in the R console:
 
 ```sh
 shiny::runAPP()
