@@ -69,7 +69,7 @@ Sys.setenv(bety_port = '5433')
 source('cache-refresh.R')
 ```
 
-Once the cache-refresh script has been run, a `cache` folder containing a `cache.RData` file should be created.
+Running the cache-refresh script should create a `cache` folder containing a `cache.RData` file.
 
 Next, start up the application by running:
 
