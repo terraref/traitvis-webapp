@@ -9,7 +9,7 @@ Time series box, line plots and heatmaps for every available season
 
 This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.
 
-You can connect to a local instance of a BETYdb database using the TERRA-REF BRAPI API. You will need to clone the [terraref/brapi repository](https://github.com/terraref/brapi) and run some Docker commands to create a connection. 
+You can connect to a local instance of a BETYdb database using the TERRA-REF BRAPI API. You will need to clone the [terraref/brapi repository](https://github.com/terraref/brapi) and run Docker commands to create a connection. 
 
 Clone terraref/brapi repository:
 
@@ -28,7 +28,7 @@ services:
       - '5432:5432'
 ```
 
-Note: If port 5432 is being used on your computer, you can use another number. Just make sure to change the first number in the pairing to the number you choose.
+Note: If port 5432 is being used on your computer, you can use any other number. Just make sure to change the first number in the pairing to the number you choose.
 
 Initialize the database:
 
