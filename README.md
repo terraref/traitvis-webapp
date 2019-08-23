@@ -18,7 +18,7 @@ git clone https://github.com/terraref/brapi.git
 cd brapi
 ```
 
-Within the brapi folder, you will need to create a `docker-compose.override.yml` to expose a port on your local machine. The following chunk can be used to expose port 5432 and should be added to the file:
+Within the brapi folder, you will need to create a `docker-compose.override.yml` file to expose a port on your local machine. The following chunk can be used to expose port 5432 and should be added to the file:
 
 ```sh
 version: '3'
@@ -59,9 +59,9 @@ git clone https://github.com/terraref/traitvis-webapp.git
 cd traitvis-webapp
 ```
 
-The `cache-refresh.R` script will need to be run and requires a database connection. Default connection parameters have been set, but the following environment variables should be set to connect to the local instance of BETYdb set up above.
+The `cache-refresh.R` script needs to be run and requires a database connection. The following connection parameters should be set as environment variables to connect to the local instance of BETYdb you set up above.
 
-In your R console, run the following commands to set connection parameters and run the cache-refresh script:
+In your R console, run the following commands to set up environment variables and run the cache-refresh script:
 
 ```sh
 Sys.setenv(bety_host = 'localhost')
