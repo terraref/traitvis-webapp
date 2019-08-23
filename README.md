@@ -18,7 +18,7 @@ git clone https://github.com/terraref/brapi.git
 cd brapi
 ```
 
-Within the brapi folder, you will need to create a `docker-compose.override.yml` to expose a port on your local machine. The following chunk will expose port 5433 and should be added to the file:
+Within the brapi folder, you will need to create a `docker-compose.override.yml` to expose a port on your local machine. The following chunk can be used to expose port 5433 and should be added to the file:
 
 ```sh
 version: '3'
