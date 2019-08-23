@@ -18,7 +18,7 @@ git clone https://github.com/terraref/brapi.git
 cd brapi
 ```
 
-Within the brapi folder, you will need to create a `docker-compose.override.yml` file to expose a port on your local machine. The following chunk can be used to expose port 5432 and should be added to the file:
+Within the brapi folder, create a `docker-compose.override.yml` file to expose a port on your local machine. The following chunk can be used to expose port 5432 and should be added to the file:
 
 ```sh
 version: '3'
@@ -40,7 +40,7 @@ docker-compose run --rm bety sync
 
 #### R packages
 
-This application requires the following R packages. Install the following packages using `install.packages()`:
+This application requires the following R packages:
 
 `shiny`, `shinythemes`, `scales`, `lubridate`, `dplyr`, `ggplot2`, `timevis`, `rgeos`, `leaflet`, `cronR`, `stringr`, `kableExtra`, `raster`, `mapview`, `leafem`, and `sf`.
 
@@ -59,9 +59,9 @@ git clone https://github.com/terraref/traitvis-webapp.git
 cd traitvis-webapp
 ```
 
-The `cache-refresh.R` script needs to be run and requires a database connection. The following connection parameters should be set as environment variables to connect to the local instance of BETYdb you set up above.
+The `cache-refresh.R` script needs to be run and requires a database connection. To connect to the local instance of BETYdb that you set up above, you will need to set the following connection parameters as environment variables.
 
-In your R console, run the following commands to set up environment variables and run the cache-refresh script:
+In your R console, run the following commands:
 
 ```sh
 Sys.setenv(bety_host = 'localhost')
@@ -71,7 +71,7 @@ source('cache-refresh.R')
 
 Once the cache-refresh script has been run, a `cache` folder containing a `cache.RData` file should be created.
 
-Next, start up the application running the following command in the R console:
+Next, start up the application by running:
 
 ```sh
 shiny::runAPP()
