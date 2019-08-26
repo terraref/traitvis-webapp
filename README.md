@@ -52,7 +52,7 @@ These thumbs should be saved to the following path in your home directory `~/dat
 
 #### How to run Shiny Application
 
-Clone the [terraref/traitvis](https://github.com/terraref/traitvis-webapp) repository.
+Clone the [terraref/traitvis](https://github.com/terraref/traitvis-webapp) repository:
 
 ```sh
 git clone https://github.com/terraref/traitvis-webapp.git
