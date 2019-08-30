@@ -571,6 +571,11 @@ router <- make_router(
   route("search", search_page, search_server)
 )
 
+# Create output for home page route
+ui <- shinyUI(fluidPage(
+  router_ui()
+))
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
