@@ -564,6 +564,13 @@ search_server <- function(input, output, session){
   })
 }
 
+# create routing
+# pass in ui and server for each page
+router <- make_router(
+  route("/", home_page, home_server),
+  route("search", search_page, search_server)
+)
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
