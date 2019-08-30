@@ -582,19 +582,3 @@ server <- shinyServer(function(input, output, session) {
 })
 
 shinyApp(ui = ui, server = server)
-server <- function(input, output) {
-  
-  # load 'full_cache_data' object from cache file
-  full_cache_data <- load_cache(full_cache_data)
-  
-  # render UI for all available experiments
-  output$page_content <- renderUI({
-    subexp_tabs <- lapply(names(full_cache_data), render_experiment_ui, full_cache_data)
-    do.call(tabsetPanel, subexp_tabs)
-  })
-  
-  # render outputs for all available experiments
-  lapply(names(full_cache_data), render_experiment_output, input, output, full_cache_data)
-}
-
-shinyApp(ui = ui, server = server)
