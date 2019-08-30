@@ -576,6 +576,11 @@ ui <- shinyUI(fluidPage(
   router_ui()
 ))
 
+# Add router to the server
+server <- shinyServer(function(input, output, session) {
+  router(input, output, session)
+})
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
