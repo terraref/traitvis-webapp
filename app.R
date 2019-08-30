@@ -414,7 +414,7 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   
   render_cultivar_menu(subexp_name, id_str, input, output, full_cache_data)
   
-  render_trait_plot(subexp_name, id_str, input, output, full_cache_data)
+  render_plot(subexp_name, id_str, input, output, full_cache_data)
   
   render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
   
