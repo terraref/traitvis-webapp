@@ -460,6 +460,18 @@ render_search_map <- function(full_cache_data, exp_name,
   }
 }
 
+render_search_plot <- function(full_cache_data, exp_name,
+                               subexp_name, var, cultivar){
+  
+  subexp_data <- full_cache_data[[ exp_name ]][[ subexp_name ]]
+  traits <- subexp_data[[ 'trait_data' ]][[ var ]][[ 'traits' ]]
+  units <- subexp_data[[ 'trait_data' ]][[ var ]][[ 'units' ]]
+  start_date <- as.Date(subexp_data[[ 'start_date' ]])
+  end_date <- as.Date(subexp_data[[ 'end_date' ]])
+  render_trait_plot(traits, var, cultivar, units, start_date, end_date)
+  
+}
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
