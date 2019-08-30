@@ -168,6 +168,7 @@ render_trait_plot <- function(plot_data, selected_variable, selected_cultivar, u
     theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlim(start_date, end_date) +
     ylim(0, data_max)
+  
 }
 
 # render box plot time series from trait records in a given subexperiment, for the selected variable
@@ -565,7 +566,7 @@ search_server <- function(input, output, session){
 # pass in ui and server for each page
 router <- make_router(
   route("/", home_page, home_server),
-  route("search", search_page, search_server)
+  route("/search", search_page, search_server)
 )
 
 # Create output for home page route
