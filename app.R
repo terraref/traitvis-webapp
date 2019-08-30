@@ -506,6 +506,64 @@ home_server <- function(input, output, session) {
   lapply(names(full_cache_data), render_experiment_output, input, output, full_cache_data)
 }
 
+# search page server
+search_server <- function(input, output, session){
+  
+  # load 'full_cache_data' object from cache file
+  full_cache_data <- load_cache(full_cache_data)
+  
+  # render search page ui
+  output$search_page_content <- renderUI({
+    fluidRow(
+      column(4, leafletOutput('search_map', width = '350px', height = '700px')),
+      column(8, uiOutput('search_hover_box'),
+             plotOutput('search_plot',
+                        hover = hoverOpts(id = 'search_hover')))
+    )
+  })
+  
+  # get url parameters
+  exp_name <- reactive({ ifelse(is.null(get_query_param()$exp),
+                                NULL, as.character(get_query_param()$exp))})
+  
+  subexp_name <- reactive({ ifelse(is.null(get_query_param()$subexp),
+                                   NULL, as.character(get_query_param()$subexp)) })
+  
+  var <- reactive({ ifelse(is.null(get_query_param()$var),
+                           NULL, as.character(get_query_param()$var)) })
+  
+  cultivar <- reactive({ ifelse(is.null(get_query_param()$cultivar),
+                                NULL, as.character(get_query_param()$cultivar)) })
+  
+  date <- reactive({ ifelse(is.null(get_query_param()$date), 
+                            NULL, as.Date(get_query_param()$date)) })
+  
+  # generate output for page
+  output$search_map <- renderLeaflet({
+    render_search_map(full_cache_data, exp_name(), subexp_name(), var(), cultivar(), date())
+  })
+  
+  output$search_plot <- renderPlot({
+    render_search_plot(full_cache_data, exp_name(), subexp_name(), var(), cultivar())
+  })
+  
+  output$search_hover_box <- renderUI({
+    req(input[[ 'search_hover' ]])
+    hover <- input[[ 'search_hover' ]]
+    wellPanel(class = 'plot-hover-info push-down',
+              HTML(paste0(
+                'Date', '<br>',
+                toString(
+                  as.Date(hover$x, origin = lubridate::origin)
+                ),
+                '<br><br>',
+                'Value', '<br>',
+                format(round(hover$y, 2))
+              ))
+    )
+  })
+}
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
