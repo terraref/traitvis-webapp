@@ -514,10 +514,10 @@ search_server <- function(input, output, session){
   
   # get url parameters
   exp_name <- reactive({ ifelse(is.null(get_query_param()$exp),
-                                NULL, as.character(get_query_param()$exp))})
+                                NULL, as.character(get_query_param()$exp_name))})
   
   subexp_name <- reactive({ ifelse(is.null(get_query_param()$subexp),
-                                   NULL, as.character(get_query_param()$subexp)) })
+                                   NULL, as.character(get_query_param()$subexp_name)) })
   
   var <- reactive({ ifelse(is.null(get_query_param()$var),
                            NULL, as.character(get_query_param()$var)) })
