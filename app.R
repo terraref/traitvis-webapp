@@ -566,7 +566,7 @@ search_server <- function(input, output, session){
 # pass in ui and server for each page
 router <- make_router(
   route("/", home_page, home_server),
-  route("/search", search_page, search_server)
+  route("search", search_page, search_server)
 )
 
 # Create output for home page route
