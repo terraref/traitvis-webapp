@@ -8,6 +8,7 @@ library(shinythemes)
 library(scales)
 library(stringr)
 library(kableExtra)
+library(shiny.router)
 
 source('render-site-map.R')
 
