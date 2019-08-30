@@ -141,9 +141,11 @@ Shiny server: see https://www.rstudio.com/products/shiny/download-server/
 - mapview
 - leafem
 - sf
+- shiny.router
 
 ```r
-install.packages(c('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR', 'stringr', 'kableExtra', 'raster', 'mapview', 'leafem', 'sf'))
+install.packages(c('shiny', 'shinythemes', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR', 'stringr', 'kableExtra', 'raster', 'mapview', 'leafem', 'sf',
+'shiny.router'))
 ```
 
 #### Deploy
