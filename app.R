@@ -42,17 +42,6 @@ if(dir.exists(image_dir)){
   image_dates <- as.Date(unique(unlist(str_extract_all(list.files(image_dir),'[0-9]{4}-[0-9]{2}-[0-9]{2}'))))
 } 
 
-  
-
-# set page UI
-ui <- fluidPage(theme = shinytheme('flatly'),
-  tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
-  title = 'TERRA-REF Experiment Data',
-  tags$img(src = 'logo.png', class = 'push-out'),
-  # destination for all dynamic UI elements
-  uiOutput('page_content')
-)
-
 # render UI for a given subexperiment
 render_subexp_ui <- function(subexp_name, exp_name) {
   
