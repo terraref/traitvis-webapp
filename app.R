@@ -472,6 +472,15 @@ render_search_plot <- function(full_cache_data, exp_name,
   
 }
 
+# home page ui (/)
+home_page <- fluidPage(theme = shinytheme('flatly'),
+                       tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
+                       title = 'TERRA-REF Experiment Data',
+                       tags$img(src = 'logo.png', class = 'push-out'),
+                       # destination for all dynamic UI elements
+                       uiOutput('home_page_content')
+)
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
