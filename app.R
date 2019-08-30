@@ -443,6 +443,23 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
   lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, experiment_name, input, output, full_cache_data[[ experiment_name ]])
 }
 
+render_search_map <- function(full_cache_data, exp_name,
+                              subexp_name, var,
+                              cultivar = 'None', date){
+  traits <- full_cache_data[[ exp_name ]][[ subexp_name ]][[ 'trait_data' ]][[ var ]][[ 'traits' ]]
+  if (cultivar != 'None'){
+    traits <- subset(traits, cultivar_name == cultivar)
+  }
+  if(dir.exists(image_dir) & (date %in% image_dates)){
+    # render site map with fullfield image if thumbs available for selected date
+    overlay_image <- 1
+    render_site_map(var, traits, date, var, overlay_image)
+  }else{
+    # render site map without fullfield image
+    render_site_map(var, traits, date, var)
+  }
+}
+
 server <- function(input, output) {
   
   # load 'full_cache_data' object from cache file
