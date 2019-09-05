@@ -45,7 +45,7 @@ render_trait_plot <- function(plot_data, selected_variable, selected_cultivar, u
       y = units
     ) +
     theme_bw() + 
-    theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) +
+    theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1), legend.position = 'bottom') +
     xlim(start_date, end_date) +
     ylim(0, data_max)
   
