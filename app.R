@@ -173,7 +173,7 @@ render_trait_plot <- function(plot_data, selected_variable, selected_cultivar, u
 
 # render box plot time series from trait records in a given subexperiment, for the selected variable
 # if a cultivar is selected, render line plot from trait records for that cultivar
-render_plot <- function(subexp_name, id_str, input, output, full_cache_data) {
+render_plot_home <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   output[[ paste0('trait_plot_', id_str) ]] <- renderPlot({
     
@@ -195,28 +195,36 @@ render_plot <- function(subexp_name, id_str, input, output, full_cache_data) {
 }
 
 # render timeline from management records in a given subexperiment
-render_mgmt_timeline <- function(subexp_name, id_str, input, output, full_cache_data) {
+render_mgmt_timeline <- function(management_data){
+  
+  if (nrow(management_data) > 0) {
+    
+    types <- management_data[[ 'mgmttype' ]]
+    dates <- management_data[[ 'date' ]]
+    
+    timeline_data <- data.frame(
+      id = 1:nrow(management_data),
+      content = types,
+      start = dates
+    )
+    
+    timevis(
+      timeline_data,
+      options = list(zoomable = FALSE)
+    )
+  }
+  
+}
+
+# render management timeline for home page
+render_mgmt_home <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   output[[ paste0('mgmt_timeline_', id_str) ]] <- renderTimevis({
     
     management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
     
-    if (nrow(management_data) > 0) {
-      
-      types <- management_data[[ 'mgmttype' ]]
-      dates <- management_data[[ 'date' ]]
-      
-      timeline_data <- data.frame(
-        id = 1:nrow(management_data),
-        content = types,
-        start = dates
-      )
-      
-      timevis(
-        timeline_data,
-        options = list(zoomable = FALSE)
-      )
-    }
+    render_mgmt_timeline(management_data)
+    
   })
 }
 
@@ -415,13 +423,13 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   
   render_cultivar_menu(subexp_name, id_str, input, output, full_cache_data)
   
-  render_plot(subexp_name, id_str, input, output, full_cache_data)
+  render_plot_home(subexp_name, id_str, input, output, full_cache_data)
   
   render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
   
   if (!is.null(full_cache_data[[ subexp_name ]][[ 'managements' ]])) {
     
-    render_mgmt_timeline(subexp_name, id_str, input, output, full_cache_data)
+    render_mgmt_home(subexp_name, id_str, input, output, full_cache_data)
     
     render_timeline_hover(subexp_name, id_str, input, output, full_cache_data)
     
@@ -470,6 +478,14 @@ render_search_plot <- function(full_cache_data, exp_name,
   
 }
 
+render_mgmt_search <- function(full_cache_data, exp_name, subexp_name){
+  
+  management_data <- full_cache_data[[ exp_name ]][[ subexp_name ]][[ 'managements' ]]
+  
+  render_mgmt_timeline(management_data)
+
+}
+
 # home page ui 
 home_page <- fluidPage(theme = shinytheme('flatly'),
                        tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
@@ -516,7 +532,9 @@ search_server <- function(input, output, session){
       column(4, leafletOutput('search_map', width = '350px', height = '700px')),
       column(8, uiOutput('search_hover_box'),
              plotOutput('search_plot',
-                        hover = hoverOpts(id = 'search_hover')))
+                        hover = hoverOpts(id = 'search_hover')),
+             uiOutput('search_timeline_info'),
+             timevisOutput('search_timeline'))
     )
   })
   
@@ -560,6 +578,11 @@ search_server <- function(input, output, session){
               ))
     )
   })
+  
+  output$search_timeline <- renderTimevis({
+    render_mgmt_search(full_cache_data, exp_name(), subexp_name())
+  })
+  
 }
 
 # create routing
