@@ -583,6 +583,29 @@ search_server <- function(input, output, session){
     render_mgmt_search(full_cache_data, exp_name(), subexp_name())
   })
   
+  output$search_timeline_info <- renderUI({
+    
+    req(input[[ paste0('search_timeline_selected') ]])
+    selected <- input[[ paste0('search_timeline_selected') ]]
+    
+    management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
+    selected_record <- management_data[ as.numeric(selected), ]
+    
+    formatted_notes <- ''
+    if (selected_record[[ 'notes' ]] != '') {
+      formatted_notes <- paste0('<br><br>', selected_record[[ 'notes' ]])
+    }
+    
+    
+    wellPanel(class = 'mgmt-select-info',
+              HTML(paste0(
+                selected_record[[ 'mgmttype' ]], '<br>',
+                selected_record[[ 'date' ]],
+                formatted_notes
+              ))
+    )
+    
+  })
 }
 
 # create routing
