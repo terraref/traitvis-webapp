@@ -74,7 +74,6 @@ get_data_for_subexp <- function(subexp, exp_name) {
   
   variables <- tbl(bety_src, 'variables') %>%
     rename(variable_id = id)  %>%
-    rename(variable_description = description) %>%
     collect() %>% 
     semi_join(traits, by = 'variable_id')
   
@@ -86,12 +85,12 @@ get_data_for_subexp <- function(subexp, exp_name) {
     variable_data <- list()
     
     variable_record <- variables %>% filter(variable_id == curr_variable_id) %>% 
-      select(variable_id, name, units, label, variable_description) %>% collect
+      select(variable_id, name, units, label, description) %>% collect
     
     variable_data[[ 'id' ]] <- variable_record %>% select(variable_id)
     variable_data[[ 'name' ]] <- variable_record %>% select(name)
     variable_data[[ 'units' ]] <- variable_record %>% select(units)
-    variable_data[[ 'description' ]] <- variable_record %>% select(variable_description)
+    variable_data[[ 'description' ]] <- variable_record %>% select(description)
     
     if(!variable_data[[ 'units' ]][[ 'units' ]]==''){
       variable_label <- paste0(variable_record[[ 'label' ]],
@@ -158,7 +157,7 @@ experiments <- tbl(bety_src, 'experiments') %>%
 
 exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
 lapply(exp_names, get_data_for_exp, experiments)
-#file.rename(cache_path_temp, cache_path)
-file.copy(cache_path_temp, cache_path)
+file.rename(cache_path_temp, cache_path)
+#file.copy(cache_path_temp, cache_path)
 message("Completed cache refresh properly.")
 
