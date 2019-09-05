@@ -11,6 +11,8 @@ library(kableExtra)
 library(shiny.router)
 
 source('render-site-map.R')
+source('render-trait-plot.R')
+source('render-mgmt-timeline.R')
 
 # create cache folder in same directory as this script (will do nothing if already exists)
 dir.create("./cache", showWarnings = FALSE)
@@ -122,58 +124,7 @@ render_cultivar_menu <- function(subexp_name, id_str, input, output, full_cache_
   })
 }
 
-# generate trait plot
-render_trait_plot <- function(plot_data, selected_variable, selected_cultivar, units, start_date, end_date){
-  data_max <- max(plot_data[[ 'mean' ]])
-  unique_vals <- unique(plot_data[[ 'mean' ]])
-  all_vals_integers <- all(unique_vals %% 1 == 0)
-  num_unique_vals <- length(unique_vals)
-  
-  plot_data$method[is.na(plot_data$method) | plot_data$method == 'NA'] <- 'Not Provided'
-  
-  trait_plot <- ggplot(data = plot_data, aes(x = as.Date(date), y = mean, color = method)) +
-    scale_colour_brewer(palette = "Set1")
-  
-  {
-    if ((num_unique_vals < 20) & (max(unique_vals) < 30) & all_vals_integers) {
-      trait_plot <- trait_plot + 
-        geom_count() + 
-        geom_vline(aes(xintercept = as.numeric(as.Date(date))),
-                   color = 'grey')
-    } else {
-      trait_plot <- trait_plot + 
-        geom_violin(scale = 'width', width = 1, aes(group = as.Date(date))) +
-        geom_boxplot(outlier.alpha = 0.25, width = 0.2, aes(group = as.Date(date)))
-    }
-    }
-  
-  if (selected_cultivar != 'None') {
-    title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in red')
-    trait_plot <- trait_plot + 
-      geom_point(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                 aes(x = as.Date(date), y = mean, group = site_id)) +
-      geom_line(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                size = 0.5, alpha = 0.5, aes(x = as.Date(date), y = mean, group = site_id)) 
-  } else {
-    title <- selected_variable
-  }
-  
-  trait_plot + 
-    labs(
-      title = paste0(title, '\n'),
-      x = "Date",
-      y = units
-    ) +
-    theme_bw() + 
-    theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) +
-    xlim(start_date, end_date) +
-    ylim(0, data_max)
-  
-}
-
-# render box plot time series from trait records in a given subexperiment, for the selected variable
-# if a cultivar is selected, render line plot from trait records for that cultivar
-render_plot_home <- function(subexp_name, id_str, input, output, full_cache_data) {
+render_home_plot <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   output[[ paste0('trait_plot_', id_str) ]] <- renderPlot({
     
@@ -194,30 +145,7 @@ render_plot_home <- function(subexp_name, id_str, input, output, full_cache_data
   })
 }
 
-# render timeline from management records in a given subexperiment
-render_mgmt_timeline <- function(management_data){
-  
-  if (nrow(management_data) > 0) {
-    
-    types <- management_data[[ 'mgmttype' ]]
-    dates <- management_data[[ 'date' ]]
-    
-    timeline_data <- data.frame(
-      id = 1:nrow(management_data),
-      content = types,
-      start = dates
-    )
-    
-    timevis(
-      timeline_data,
-      options = list(zoomable = FALSE)
-    )
-  }
-  
-}
-
-# render management timeline for home page
-render_mgmt_home <- function(subexp_name, id_str, input, output, full_cache_data) {
+render_home_mgmt_timeline <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   output[[ paste0('mgmt_timeline_', id_str) ]] <- renderTimevis({
     
@@ -228,57 +156,28 @@ render_mgmt_home <- function(subexp_name, id_str, input, output, full_cache_data
   })
 }
 
-# render info box for date and value of cursor when hovering box/line plot
-render_plot_hover <- function(subexp_name, id_str, input, output, full_cache_data) {
+render_home_plot_hover <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   output[[ paste0('plot_hover_info_', id_str) ]] <- renderUI({
     
-    req(input[[ paste0('plot_hover_', id_str) ]])
-    
-    hover <- input[[ paste0('plot_hover_', id_str) ]]
-    
-    wellPanel(class = 'plot-hover-info push-down',
-      HTML(paste0(
-        'Date', '<br>',
-        toString(
-          as.Date(hover$x, origin = lubridate::origin)
-        ),
-        '<br><br>',
-        'Value', '<br>',
-        format(round(hover$y, 2))
-      ))
-    )
+    render_plot_hover(paste0('plot_hover_', id_str), input)
+
   })
 }
 
-# render info box for date, type, and notes of selected (clicked) timeline item
-render_timeline_hover <- function(subexp_name, id_str, input, output, full_cache_data) {
+
+render_home_timeline_hover <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   output[[ paste0('mgmt_select_info_', id_str) ]] <- renderUI({
     
-    req(input[[ paste0('mgmt_timeline_', id_str, '_selected') ]])
-    selected <- input[[ paste0('mgmt_timeline_', id_str, '_selected') ]]
+    subexp_data <- full_cache_data[[ subexp_name ]]
     
-    management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
-    selected_record <- management_data[ as.numeric(selected), ]
+    render_timeline_hover(paste0('mgmt_timeline_', id_str, '_selected'), subexp_data, input)
     
-    formatted_notes <- ''
-    if (selected_record[[ 'notes' ]] != '') {
-      formatted_notes <- paste0('<br><br>', selected_record[[ 'notes' ]])
-    }
-      
-    
-    wellPanel(class = 'mgmt-select-info',
-      HTML(paste0(
-        selected_record[[ 'mgmttype' ]], '<br>',
-        selected_record[[ 'date' ]],
-        formatted_notes
-      ))
-    )
   })
 }
 
-render_map <- function(subexp_name, id_str, input, output, full_cache_data) {
+render_home_map <- function(subexp_name, id_str, input, output, full_cache_data) {
   
   # render slider input from dates in a given subexperiment
   output[[ paste0('map_date_slider_', id_str) ]] <- renderUI({
@@ -423,21 +322,21 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   
   render_cultivar_menu(subexp_name, id_str, input, output, full_cache_data)
   
-  render_plot_home(subexp_name, id_str, input, output, full_cache_data)
+  render_home_plot(subexp_name, id_str, input, output, full_cache_data)
   
-  render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
+  render_home_plot_hover(subexp_name, id_str, input, output, full_cache_data)
   
   if (!is.null(full_cache_data[[ subexp_name ]][[ 'managements' ]])) {
     
-    render_mgmt_home(subexp_name, id_str, input, output, full_cache_data)
+    render_home_mgmt_timeline(subexp_name, id_str, input, output, full_cache_data)
     
-    render_timeline_hover(subexp_name, id_str, input, output, full_cache_data)
+    render_home_timeline_hover(subexp_name, id_str, input, output, full_cache_data)
     
   }
   
   if(subexp_name != 'Drought Tolerance' & exp_name != 'Danforth Sorghum Pilot'){
     
-    render_map(subexp_name, id_str, input, output, full_cache_data)
+    render_home_map(subexp_name, id_str, input, output, full_cache_data)
     
   }
   
@@ -478,13 +377,21 @@ render_search_plot <- function(full_cache_data, exp_name,
   
 }
 
-render_mgmt_search <- function(full_cache_data, exp_name, subexp_name){
+render_search_mgmt_timeline <- function(full_cache_data, exp_name, subexp_name){
   
   management_data <- full_cache_data[[ exp_name ]][[ subexp_name ]][[ 'managements' ]]
   
   render_mgmt_timeline(management_data)
 
 }
+
+render_search_timeline_hover <- function(full_cache_data, exp_name, subexp_name, selected_input_id, input){
+  
+  subexp_data <- full_cache_data[[ exp_name ]][[ subexp_name ]]
+  
+  render_timeline_hover(selected_input_id, subexp_data, input)
+}
+
 
 # home page ui 
 home_page <- fluidPage(theme = shinytheme('flatly'),
@@ -530,9 +437,9 @@ search_server <- function(input, output, session){
   output$search_page_content <- renderUI({
     fluidRow(
       column(4, leafletOutput('search_map', width = '350px', height = '700px')),
-      column(8, uiOutput('search_hover_box'),
+      column(8, fluidRow(uiOutput('search_plot_hover_box')),
              plotOutput('search_plot',
-                        hover = hoverOpts(id = 'search_hover')),
+                        hover = hoverOpts(id = 'search_plot_hover')),
              uiOutput('search_timeline_info'),
              timevisOutput('search_timeline'))
     )
@@ -563,48 +470,16 @@ search_server <- function(input, output, session){
     render_search_plot(full_cache_data, exp_name(), subexp_name(), var(), cultivar())
   })
   
-  output$search_hover_box <- renderUI({
-    req(input[[ 'search_hover' ]])
-    hover <- input[[ 'search_hover' ]]
-    wellPanel(class = 'plot-hover-info push-down',
-              HTML(paste0(
-                'Date', '<br>',
-                toString(
-                  as.Date(hover$x, origin = lubridate::origin)
-                ),
-                '<br><br>',
-                'Value', '<br>',
-                format(round(hover$y, 2))
-              ))
-    )
+  output$search_plot_hover_box <- renderUI({
+    render_plot_hover('search_plot_hover', input)
   })
   
   output$search_timeline <- renderTimevis({
-    render_mgmt_search(full_cache_data, exp_name(), subexp_name())
+    render_search_mgmt_timeline(full_cache_data, exp_name(), subexp_name())
   })
   
   output$search_timeline_info <- renderUI({
-    
-    req(input[[ paste0('search_timeline_selected') ]])
-    selected <- input[[ paste0('search_timeline_selected') ]]
-    
-    management_data <- full_cache_data[[ subexp_name ]][[ 'managements' ]]
-    selected_record <- management_data[ as.numeric(selected), ]
-    
-    formatted_notes <- ''
-    if (selected_record[[ 'notes' ]] != '') {
-      formatted_notes <- paste0('<br><br>', selected_record[[ 'notes' ]])
-    }
-    
-    
-    wellPanel(class = 'mgmt-select-info',
-              HTML(paste0(
-                selected_record[[ 'mgmttype' ]], '<br>',
-                selected_record[[ 'date' ]],
-                formatted_notes
-              ))
-    )
-    
+    render_search_timeline_hover(full_cache_data, exp_name(), subexp_name(), 'search_timeline_selected', input)
   })
 }
 
