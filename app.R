@@ -296,14 +296,14 @@ render_method_table <- function(subexp_name, id_str, input, output, full_cache_d
     
     traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     
-    method_names <- unique(traits$method)
-    method_ids <- unique(traits$method_id)
+    methods <- traits %>%
+      distinct(method, method_id, method_description) %>%
+      mutate(bety_link = paste0("https://terraref.ncsa.illinois.edu/bety/methods/",
+                                method_id))
     
-    method_df <- data.frame('name' = method_names,
-                            'BETYdb link' = text_spec(paste0( "https://terraref.ncsa.illinois.edu/bety/methods/",
-                                                              method_ids),
-                                                      link = paste0("https://terraref.ncsa.illinois.edu/bety/methods/",
-                                                                    method_ids)),
+    method_df <- data.frame('name' = text_spec(methods$method,
+                                               link = methods$bety_link),
+                            'description' = methods$method_description,
                             check.names = FALSE)
     
     method_kable <- kable(method_df,
