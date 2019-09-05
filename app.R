@@ -303,8 +303,7 @@ render_method_table <- function(subexp_name, id_str, input, output, full_cache_d
     
     method_df <- data.frame('name' = text_spec(methods$method,
                                                link = methods$bety_link),
-                            'description' = methods$method_description,
-                            check.names = FALSE)
+                            'description' = methods$method_description)
     
     method_kable <- kable(method_df,
                           format = 'html',
