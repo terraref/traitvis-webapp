@@ -62,7 +62,8 @@ get_data_for_subexp <- function(subexp, exp_name) {
   methods_table <- tbl(bety_src, 'methods') %>% 
     dplyr::rename(method_id = id) %>% 
     dplyr::rename(method = name) %>% 
-    select(method_id, method)
+    dplyr::rename(method_description = description) %>%
+    select(method_id, method, method_description)
     
   
   traits <- traits_table %>% 
