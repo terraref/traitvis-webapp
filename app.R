@@ -261,13 +261,13 @@ render_variable_table <- function(subexp_name, id_str, input, output, full_cache
     
     variable_name <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'name' ]]
     variable_id <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'id' ]]
+    description <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'description' ]]
     
-    variable_df <- data.frame('name' = variable_name,
-                              'BETYdb link' = text_spec(paste0( "https://terraref.ncsa.illinois.edu/bety/variables/",
-                                                                variable_id),
-                                                        link = paste0("https://terraref.ncsa.illinois.edu/bety/variables/",
-                                                                      variable_id)),
-                              check.names = FALSE)
+    
+    variable_df <- data.frame('name' = text_spec(variable_name,
+                                                 link = paste0("https://terraref.ncsa.illinois.edu/bety/variables/",
+                                                               variable_id)),
+                              'description' = description)
     
     variable_kable <- kable(variable_df,
                             format = 'html',
