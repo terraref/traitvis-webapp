@@ -348,48 +348,95 @@ render_experiment_output <- function(experiment_name, input, output, full_cache_
   lapply(names(full_cache_data[[ experiment_name ]]), render_subexp_output, experiment_name, input, output, full_cache_data[[ experiment_name ]])
 }
 
-render_search_map <- function(full_cache_data, exp_name,
+render_search_ui <- function(){
+  fluidRow(
+    column(4, leafletOutput('search_map', width = '350px', height = '700px')),
+    column(8, fluidRow(uiOutput('search_plot_hover_box')),
+           plotOutput('search_plot',
+                      hover = hoverOpts(id = 'search_plot_hover')),
+           uiOutput('search_timeline_info'),
+           timevisOutput('search_timeline'))
+  )
+}
+
+render_search_output <- function(full_cache_data, input, output, exp_name, subexp_name, var, cultivar, date){
+  
+  render_search_map(full_cache_data, input, output,
+                    exp_name, subexp_name, var,
+                    cultivar, date)
+  
+  render_search_plot(full_cache_data, input, output,
+                     exp_name, subexp_name, var,
+                     cultivar)
+  
+  output$search_plot_hover_box <- renderUI({
+    render_plot_hover('search_plot_hover', input)
+  })
+  
+  render_search_mgmt_timeline(full_cache_data, output, exp_name, subexp_name)
+  
+  render_search_timeline_hover(full_cache_data, input, output,
+                               exp_name, subexp_name, 'search_timeline_selected')
+  
+}
+
+render_search_map <- function(full_cache_data, input, output, exp_name,
                               subexp_name, var,
                               cultivar = 'None', date){
-  traits <- full_cache_data[[ exp_name ]][[ subexp_name ]][[ 'trait_data' ]][[ var ]][[ 'traits' ]]
-  if (cultivar != 'None'){
-    traits <- subset(traits, cultivar_name == cultivar)
-  }
-  if(dir.exists(image_dir) & (date %in% image_dates)){
-    # render site map with fullfield image if thumbs available for selected date
-    overlay_image <- 1
-    render_site_map(var, traits, date, var, overlay_image)
-  }else{
-    # render site map without fullfield image
-    render_site_map(var, traits, date, var)
-  }
+  
+  output$search_map <- renderLeaflet({
+    
+    traits <- full_cache_data[[ exp_name ]][[ subexp_name ]][[ 'trait_data' ]][[ var ]][[ 'traits' ]]
+    if (cultivar != 'None'){
+      traits <- subset(traits, cultivar_name == cultivar)
+    }
+    if(dir.exists(image_dir) & (date %in% image_dates)){
+      # render site map with fullfield image if thumbs available for selected date
+      overlay_image <- 1
+      render_site_map(var, traits, date, var, overlay_image)
+    }else{
+      # render site map without fullfield image
+      render_site_map(var, traits, date, var)
+    }
+  
+  })
 }
 
-render_search_plot <- function(full_cache_data, exp_name,
+render_search_plot <- function(full_cache_data, input, output, exp_name,
                                subexp_name, var, cultivar){
   
-  subexp_data <- full_cache_data[[ exp_name ]][[ subexp_name ]]
-  traits <- subexp_data[[ 'trait_data' ]][[ var ]][[ 'traits' ]]
-  units <- subexp_data[[ 'trait_data' ]][[ var ]][[ 'units' ]]
-  start_date <- as.Date(subexp_data[[ 'start_date' ]])
-  end_date <- as.Date(subexp_data[[ 'end_date' ]])
-  render_trait_plot(traits, var, cultivar, units, start_date, end_date)
-  
-}
-
-render_search_mgmt_timeline <- function(full_cache_data, exp_name, subexp_name){
-  
-  management_data <- full_cache_data[[ exp_name ]][[ subexp_name ]][[ 'managements' ]]
-  
-  render_mgmt_timeline(management_data)
+  output$search_plot <- renderPlot({
+    subexp_data <- full_cache_data[[ exp_name ]][[ subexp_name ]]
+    traits <- subexp_data[[ 'trait_data' ]][[ var ]][[ 'traits' ]]
+    units <- subexp_data[[ 'trait_data' ]][[ var ]][[ 'units' ]]
+    start_date <- as.Date(subexp_data[[ 'start_date' ]])
+    end_date <- as.Date(subexp_data[[ 'end_date' ]])
+    render_trait_plot(traits, var, cultivar, units, start_date, end_date)
+  })
 
 }
 
-render_search_timeline_hover <- function(full_cache_data, exp_name, subexp_name, selected_input_id, input){
+render_search_mgmt_timeline <- function(full_cache_data, output, exp_name, subexp_name){
   
-  subexp_data <- full_cache_data[[ exp_name ]][[ subexp_name ]]
+  output$search_timeline <- renderTimevis({
+    
+    management_data <- full_cache_data[[ exp_name ]][[ subexp_name ]][[ 'managements' ]]
+    
+    render_mgmt_timeline(management_data)
+
+  })
+
+}
+
+render_search_timeline_hover <- function(full_cache_data, input, output, exp_name, subexp_name, selected_input_id){
   
-  render_timeline_hover(selected_input_id, subexp_data, input)
+  output$search_timeline_info <- renderUI({
+    
+    subexp_data <- full_cache_data[[ exp_name ]][[ subexp_name ]]
+    
+    render_timeline_hover(selected_input_id, subexp_data, input)
+    
+  })
 }
 
 
@@ -433,18 +480,6 @@ search_server <- function(input, output, session){
   # load 'full_cache_data' object from cache file
   full_cache_data <- load_cache(full_cache_data)
   
-  # render search page ui
-  output$search_page_content <- renderUI({
-    fluidRow(
-      column(4, leafletOutput('search_map', width = '350px', height = '700px')),
-      column(8, fluidRow(uiOutput('search_plot_hover_box')),
-             plotOutput('search_plot',
-                        hover = hoverOpts(id = 'search_plot_hover')),
-             uiOutput('search_timeline_info'),
-             timevisOutput('search_timeline'))
-    )
-  })
-  
   # get url parameters
   exp_name <- reactive({ ifelse(is.null(get_query_param()$exp),
                                 NULL, as.character(get_query_param()$exp_name))})
@@ -460,27 +495,16 @@ search_server <- function(input, output, session){
   
   date <- reactive({ ifelse(is.null(get_query_param()$date), 
                             NULL, as.Date(get_query_param()$date)) })
-  
-  # generate output for page
-  output$search_map <- renderLeaflet({
-    render_search_map(full_cache_data, exp_name(), subexp_name(), var(), cultivar(), date())
+
+  # render search page ui
+  output$search_page_content <- renderUI({
+    render_search_ui()
   })
   
-  output$search_plot <- renderPlot({
-    render_search_plot(full_cache_data, exp_name(), subexp_name(), var(), cultivar())
-  })
-  
-  output$search_plot_hover_box <- renderUI({
-    render_plot_hover('search_plot_hover', input)
-  })
-  
-  output$search_timeline <- renderTimevis({
-    render_search_mgmt_timeline(full_cache_data, exp_name(), subexp_name())
-  })
-  
-  output$search_timeline_info <- renderUI({
-    render_search_timeline_hover(full_cache_data, exp_name(), subexp_name(), 'search_timeline_selected', input)
-  })
+  # render search page output
+  render_search_output(full_cache_data, input, output,
+                       exp_name(), subexp_name(), var(), cultivar(), date())
+
 }
 
 # create routing
