@@ -2,10 +2,9 @@
 
 Time series box, line plots and heatmaps for every available season
 
+## Development
 
-### Set up a local development environment
-
-#### Database connection
+### Database connection
 
 This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.
 
@@ -38,19 +37,19 @@ docker-compose run --rm bety initialize
 docker-compose run --rm bety sync
 ```
 
-#### R packages
+### R packages
 
 This application requires the following R packages:
 
 `shiny`, `shinythemes`, `scales`, `lubridate`, `dplyr`, `ggplot2`, `timevis`, `rgeos`, `leaflet`, `cronR`, `stringr`, `kableExtra`, `raster`, `mapview`, `leafem`, and `sf`.
 
-#### Download image thumbnails
+### Download image thumbnails
 
 Fullfield image thumbnails are available to be displayed under heatmaps. These thumbnails can be downloaded from the `/ua-mac/Level_2/rgb_fullfield/_thumbs/` endpoint on [Globus](https://www.globus.org/).
 
 These thumbs should be saved to the following path in your home directory `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
 
-#### How to run Shiny Application
+### How to run Shiny Application
 
 Clone the [terraref/traitvis](https://github.com/terraref/traitvis-webapp) repository:
 
