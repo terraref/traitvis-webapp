@@ -84,7 +84,7 @@ Next, start up the application by running:
 shiny::runAPP()
 ```
 
-### Deploy application using Docker
+## Deploy application using Docker
 
 ```sh
 git clone https://github.com/terraref/traitvis-webapp
