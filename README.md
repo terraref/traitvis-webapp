@@ -4,6 +4,12 @@ Time series box, line plots and heatmaps for every available season
 
 ## Development
 
+A local development environment can be set up on your computer. In order to run this shiny application, you will need to download R and Docker. Docker will be used in creating a connection to a BETYdb database. 
+
+You will also need to create a globus account at [globus.org](https://www.globus.org/) and download [Globus Connect Personal](https://www.globus.org/globus-connect-personal). The `terraref` endpoint contains RGB fullfield image thumbnails that can be displayed in the map tab of the application.
+
+
+
 ### Database connection
 
 This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.
