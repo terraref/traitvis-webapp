@@ -49,7 +49,9 @@ docker-compose run --rm bety sync
 
 This application depends on a number of R packages; this is how you can install them:
 
-`shiny`, `shinythemes`, `scales`, `lubridate`, `dplyr`, `ggplot2`, `timevis`, `rgeos`, `leaflet`, `cronR`, `stringr`, `kableExtra`, `raster`, `mapview`, `leafem`, and `sf`.
+```
+install.packages(c('shiny', 'shinythemes', 'scales', 'lubridate', 'dplyr', 'ggplot2', 'timevis', 'rgeos', 'leaflet', 'cronR', 'stringr', 'kableExtra', 'raster', 'mapview', 'leafem', 'sf'))
+```
 
 ### Download image thumbnails
 
