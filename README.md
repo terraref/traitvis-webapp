@@ -27,7 +27,9 @@ services:
       - '5432:5432'
 ```
 
-Note: If port 5432 is being used on your computer, you can use any other number. Just make sure to change the first number in the pairing to the number you choose.
+Note: If you are already running Postgres, it is likely that port 5432 is being used on your computer. 
+In this case, you can assign another number such as 5433. 
+Just make sure to change the first number in the pairing to the number you choose, e.g. 5433:5432 means you are mapping your computer's port 5433 to the Docker container's Postgres port 5432.
 
 Initialize the database:
 
@@ -39,7 +41,7 @@ docker-compose run --rm bety sync
 
 ### R packages
 
-This application requires the following R packages:
+This application depends on a number of R packages; this is how you can install them:
 
 `shiny`, `shinythemes`, `scales`, `lubridate`, `dplyr`, `ggplot2`, `timevis`, `rgeos`, `leaflet`, `cronR`, `stringr`, `kableExtra`, `raster`, `mapview`, `leafem`, and `sf`.
 
