@@ -8,7 +8,7 @@ A local development environment can be set up on your computer. In order to run 
 
 You will also need to create a globus account at [globus.org](https://www.globus.org/) and download [Globus Connect Personal](https://www.globus.org/globus-connect-personal). The `terraref` endpoint contains RGB fullfield image thumbnails that can be displayed in the map tab of the application.
 
-
+More detailed information on required R packages, image thumbnails, how to set up a database connection, and how to get the shiny application running is described in the following sections.
 
 ### Database connection
 
