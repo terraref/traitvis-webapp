@@ -1,6 +1,6 @@
 ## A Shiny web-app for visualizing trait data in BETYdb
 
-Time series box, line plots and heatmaps for every available season
+This shiny application provides a visual summary of the available data in BETYdb. You can view time series box, line plots, and heatmaps available for every season by trait. Descriptions of selected trait and methods of measurement are provided. Instructions on how to download selected data can be found in the downloads tab.
 
 ## Development
 
