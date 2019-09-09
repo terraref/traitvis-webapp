@@ -24,17 +24,7 @@ docker run -ti --rm --network bety_bety -e BETY_INITIALIZE_URL='-w https://terra
 docker run -ti --rm --network bety_bety -e REMOTE_SERVERS=6  pecan/bety:terra sync
 ```
 
-Note: If you are already running Postgres, it is likely that port 5432 is being used on your computer. 
-In this case, you can assign another number such as 5433. 
-Just make sure to change the first number in the pairing to the number you choose, e.g. 5433:5432 means you are mapping your computer's port 5433 to the Docker container's Postgres port 5432.
-
-Initialize the database:
-
-```sh
-docker-compose up -d postgres
-docker-compose run --rm bety initialize
-docker-compose run --rm bety sync
-```
+Note: In the docker-compose.override.yml file, `5433:5432` maps your computer's port 5433 to the Docker container's Postgres port 5432. If you would like to expose another port, change the first number in the pairing to whatever number you want.
 
 ### R packages
 
