@@ -24,7 +24,7 @@ docker run -ti --rm --network bety_bety -e BETY_INITIALIZE_URL='-w https://terra
 docker run -ti --rm --network bety_bety -e REMOTE_SERVERS=6  pecan/bety:terra sync
 ```
 
-Note: In the docker-compose.override.yml file, `5433:5432` maps your computer's port 5433 to the Docker container's Postgres port 5432. If you would like to expose another port, change the first number in the pairing to whatever number you want.
+Note: In the docker-compose.override.yml file, `5433:5432` maps your computer's port 5433 to the Docker container's Postgres port 5432. If you would like to expose another port, change the first number in the pairing to whatever number you want. Just make sure to update the port number when setting the `bety_port` environment variable below.
 
 ### R packages
 
