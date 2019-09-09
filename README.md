@@ -14,7 +14,7 @@ More detailed information on required R packages, image thumbnails, how to set u
 
 This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.
 
-A connection to a local instance of BETYdb can be created using the TERRA-REF BRAPI API. Run the following Docker commands to create a connection:
+A connection to a local instance of BETYdb can be created using the TERRA-REF BRAPI API. Run the following Docker commands to create a connection (you can ignore premission errors):
 
 ```sh
 docker-compose -p bety up  -d postgres
