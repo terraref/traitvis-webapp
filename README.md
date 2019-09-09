@@ -24,16 +24,6 @@ docker run -ti --rm --network bety_bety -e BETY_INITIALIZE_URL='-w https://terra
 docker run -ti --rm --network bety_bety -e REMOTE_SERVERS=6  pecan/bety:terra sync
 ```
 
-Within the brapi folder, create a `docker-compose.override.yml` file to expose a port on your local machine. The following chunk can be used to expose port 5432 and should be added to the file:
-
-```sh
-version: '3'
-services:
-  postgres:
-    ports:
-      - '5432:5432'
-```
-
 Note: If you are already running Postgres, it is likely that port 5432 is being used on your computer. 
 In this case, you can assign another number such as 5433. 
 Just make sure to change the first number in the pairing to the number you choose, e.g. 5433:5432 means you are mapping your computer's port 5433 to the Docker container's Postgres port 5432.
