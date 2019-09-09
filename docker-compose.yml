@@ -1,0 +1,66 @@
+#docker-compose -p bety up  -d postgres
+#
+# initialize BETY database
+#docker run -ti --rm --network bety_bety -e BETY_INITIALIZE_URL='-w https://terraref.ncsa.illinois.edu/bety/dump/bety0/bety.tar.gz' pecan/bety:develop initialize
+#
+# sync  BETY database
+#docker run -ti --rm --network bety_bety -e REMOTE_SERVERS=6  pecan/bety:terra sync
+#
+# run brapi:
+# docker-compose -p bety up brapi
+
+version: "3"
+
+services:
+  # postgresql + postgis to hold all the data
+  postgres:
+    image: mdillon/postgis:9.5
+    networks:
+      - bety
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+
+  # BETY rails frontend to the database
+  bety:
+    image: pecan/bety:${BRANCH:-latest}
+    networks:
+      - bety
+    ports:
+      - 8000:8000
+    environment:
+      - INITIALIZE_URL=-w https://terraref.ncsa.illinois.edu/bety/dump/bety0/bety.tar.gz
+      - REMOTE_SERVERS=6
+      - UNICORN_WORKER_PROCESSES=1
+      - SECRET_KEY_BASE=thisissomereallllllylongsecretkeyandshouldbelongerthanthis
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # BRAPI
+  brapi:
+    image: terraref/brapi:openapi
+    ports:
+      - 5000:5000
+    environment:
+      - DBHOST=postgres
+    networks:
+      - bety
+    depends_on:
+      - postgres
+
+  # BRAVA
+  brava:
+    image: terraref/brapi-validator
+    ports:
+      - 8080:8080
+    networks:
+      - bety
+
+networks:
+  bety:
+
+volumes:
+  postgres:
