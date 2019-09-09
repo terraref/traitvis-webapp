@@ -30,7 +30,7 @@ RUN install2.r --error \
          RPostgreSQL \
          timevis \
          kableExtra \
-         shiny.router
+         shiny.router \
       && rm -rf /srv/shiny-server/sample-apps
 
 RUN apt-get install -y \
