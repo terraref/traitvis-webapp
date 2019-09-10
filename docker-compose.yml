@@ -5,9 +5,6 @@
 #
 # sync  BETY database
 #docker run -ti --rm --network bety_bety -e REMOTE_SERVERS=6  pecan/bety:terra sync
-#
-# run brapi:
-# docker-compose -p bety up brapi
 
 version: "3"
 
@@ -38,27 +35,7 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
-
-  # BRAPI
-  brapi:
-    image: terraref/brapi:openapi
-    ports:
-      - 5000:5000
-    environment:
-      - DBHOST=postgres
-    networks:
-      - bety
-    depends_on:
-      - postgres
-
-  # BRAVA
-  brava:
-    image: terraref/brapi-validator
-    ports:
-      - 8080:8080
-    networks:
-      - bety
-
+    
 networks:
   bety:
 
