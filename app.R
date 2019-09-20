@@ -195,7 +195,8 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
         y = units
       ) +
       theme_bw() + 
-      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) +
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1),
+            plot.caption = element_text(hjust = 0)) +
       xlim(as.Date(selected_subexp_data[[ 'start_date' ]]), as.Date(selected_subexp_data[[ 'end_date' ]])) +
       ylim(0, data_max)
   })
