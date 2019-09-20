@@ -186,6 +186,11 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
     trait_plot + 
       labs(
         title = paste0(title, '\n'),
+        caption = paste0('The above plot is a time series consisting of violin plots that contain a box plot and outliers.',
+                         'The box represents the interquartile range (IQR), and the line in the middle of the box represents the median.',
+                         '\n',
+                         'The whiskers of the box extend from the lower (Q1) or upper (Q3) quartile to the minimum or maximum data point that is not considered an outlier.',
+                         'Outliers are data points that are either less than Q1 - 1.5*IQR or greater than Q3 + 1.5*IQR.'),
         x = "Date",
         y = units
       ) +
