@@ -207,7 +207,8 @@ render_rep_plot <- function(subexp_name, id_str, input, output, full_cache_data)
     req(input[[ paste0('selected_variable_', id_str) ]])
     selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
     
-    trait_data <-  full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    selected_subexp_data <- full_cache_data[[ subexp_name ]]
+    trait_data <-  selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
     trait_data$date <- as.Date(trait_data$date)
     rep_data <- data.frame()
     
@@ -230,7 +231,8 @@ render_rep_plot <- function(subexp_name, id_str, input, output, full_cache_data)
         y = "Repeatibility"
       ) +
       theme_bw() + 
-      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) + 
+      xlim(as.Date(selected_subexp_data[[ 'start_date' ]]), as.Date(selected_subexp_data[[ 'end_date' ]]))
     
   })
   
