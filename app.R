@@ -460,6 +460,8 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   
   render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
   
+  render_rep_plot(subexp_name, id_str, input, output, full_cache_data)
+  
   if (!is.null(full_cache_data[[ subexp_name ]][[ 'managements' ]])) {
     
     render_mgmt_timeline(subexp_name, id_str, input, output, full_cache_data)
