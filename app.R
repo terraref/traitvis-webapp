@@ -198,6 +198,43 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
   })
 }
 
+# render repeatibility plot for a given subexperiment
+render_rep_plot <- function(subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('rep_plot_', id_str) ]] <- renderPlot({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    
+    trait_data <-  full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    trait_data$date <- as.Date(trait_data$date)
+    rep_data <- data.frame()
+    
+    for(sel_date in as.list(unique(trait_data$date))){
+      date_subset <- trait_data[trait_data$date == sel_date,]
+      rep <- repeatability(data.vector = date_subset$mean,
+                           geno.vector = date_subset$cultivar_name)
+      new_row <- data.frame(date = sel_date, repeatability = rep$repeatability)
+      rep_data <- rbind(rep_data, new_row)
+    }
+    
+    rep_plot <- ggplot(data = rep_data, aes(x = date, y = repeatability)) +
+      geom_point(size = 0.5) + 
+      geom_line(size = 0.5, alpha = 0.5, color = 'red')
+    
+    rep_plot + 
+      labs(
+        title = 'Repeatibility over Season',
+        x = "Date",
+        y = "Repeatibility"
+      ) +
+      theme_bw() + 
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1))
+    
+  })
+  
+}
+
 # render timeline from management records in a given subexperiment
 render_mgmt_timeline <- function(subexp_name, id_str, input, output, full_cache_data) {
   
