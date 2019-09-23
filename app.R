@@ -226,7 +226,7 @@ render_rep_plot <- function(subexp_name, id_str, input, output, full_cache_data)
     
     rep_plot + 
       labs(
-        title = 'Repeatibility over Season',
+        title = 'Within season heritability',
         x = "Date",
         y = "Repeatibility"
       ) +
