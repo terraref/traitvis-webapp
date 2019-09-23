@@ -8,6 +8,7 @@ library(shinythemes)
 library(scales)
 library(stringr)
 library(kableExtra)
+library(heritability)
 
 source('render-site-map.R')
 
