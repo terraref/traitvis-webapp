@@ -191,7 +191,9 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
                          '\n',
                          'The whiskers of the box extend from the lower (Q1) or upper (Q3) quartile to the minimum or maximum data point that is not considered an outlier. ',
                          '\n',
-                         'Outliers are data points that are either less than Q1 - 1.5*IQR or greater than Q3 + 1.5*IQR. Outliers are the points that lie above or below the whiskers.'),
+                         'Outliers are data points that are either less than Q1 - 1.5*IQR or greater than Q3 + 1.5*IQR. Outliers are the points that lie above or below the whiskers. ',
+                         '\n',
+                         'If a cultivar is selected, a red line will connect the cultivar specific data points.'),
         x = "Date",
         y = units
       ) +
