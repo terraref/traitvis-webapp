@@ -76,6 +76,8 @@ render_subexp_ui <- function(subexp_name, exp_name) {
                         hover = hoverOpts(id = paste0('plot_hover_', id_str)))
           ),
           hr(),
+          plotOutput(paste0('rep_plot_', id_str)),
+          hr(),
           uiOutput(paste0('mgmt_select_info_', id_str)),
           timevisOutput(paste0('mgmt_timeline_', id_str))
         ),
