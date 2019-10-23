@@ -266,15 +266,14 @@ render_variable_table <- function(subexp_name, id_str, input, output, full_cache
     description <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'description' ]]
     
     
-    variable_df <- data.frame('name' = text_spec(variable_name,
+    variable_df <- data.frame('variable' = text_spec(variable_name,
                                                  link = paste0("https://terraref.ncsa.illinois.edu/bety/variables/",
                                                                variable_id)),
                               'description' = description)
     
     variable_kable <- kable(variable_df,
                             format = 'html',
-                            escape = FALSE,
-                            caption = 'Variable information') %>% 
+                            escape = FALSE) %>% #,      caption = 'Variable information'
       kable_styling(bootstrap_options = 'hover')
     
     variable_kable_updated <- column_spec(variable_kable,
@@ -303,14 +302,13 @@ render_method_table <- function(subexp_name, id_str, input, output, full_cache_d
       mutate(bety_link = paste0("https://terraref.ncsa.illinois.edu/bety/methods/",
                                 method_id))
     
-    method_df <- data.frame('name' = text_spec(methods$method,
+    method_df <- data.frame('method' = text_spec(methods$method,
                                                link = methods$bety_link),
                             'description' = methods$method_description)
     
     method_kable <- kable(method_df,
                           format = 'html',
-                          escape = FALSE,
-                          caption = 'Method information') %>% 
+                          escape = FALSE) %>% 
       kable_styling(bootstrap_options = 'hover')
     
     method_kable_updated <- column_spec(method_kable,
