@@ -71,7 +71,7 @@ Running the cache-refresh script should create a `cache` folder containing a `ca
 Next, start up the application by running:
 
 ```r
-shiny::runAPP()
+shiny::runApp()
 ```
 
 ## Deploy application using Docker
