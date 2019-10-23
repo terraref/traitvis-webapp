@@ -78,6 +78,8 @@ render_subexp_ui <- function(subexp_name, exp_name) {
           ),
           hr(),
           plotOutput(paste0('rep_plot_', id_str)),
+          htmlOutput(paste0('variable_table_', id_str)),
+          htmlOutput(paste0('method_table_', id_str)),
           hr(),
           uiOutput(paste0('mgmt_select_info_', id_str)),
           timevisOutput(paste0('mgmt_timeline_', id_str))
@@ -189,11 +191,25 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
     trait_plot + 
       labs(
         title = paste0(title, '\n'),
+        caption = paste0('
+The above plot is a time series consisting of violin plots that contain a box
+plot and outliers. Below you will find a table that defines the phenotype
+(variable) being plotted and the method used to measure the phenotype. The box
+represents the interquartile range (IQR), and the line in the middle of the box
+represents the median. The whiskers of the box extend from the lower (Q1) or
+upper (Q3) quartile to the minimum or maximum data point that is not considered
+an outlier.  Outliers are data points that are either less than Q1 - 1.5*IQR or
+greater than Q3 + 1.5*IQR. Outliers are the points that lie above or below the
+whiskers. If a cultivar is selected, a red line will connect the cultivar
+specific ndata points.\n'),
         x = "Date",
         y = units
       ) +
       theme_bw() + 
-      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) +
+      theme(text = element_text(size = 20), 
+                  axis.text.x = element_text(angle = 45, hjust = 1),
+                  plot.caption = element_text(hjust = 0, size = 10), 
+                  legend.position = 'bottom') +
       xlim(as.Date(selected_subexp_data[[ 'start_date' ]]), as.Date(selected_subexp_data[[ 'end_date' ]])) +
       ylim(0, data_max)
   })
@@ -285,6 +301,74 @@ render_plot_hover <- function(subexp_name, id_str, input, output, full_cache_dat
       ))
     )
   })
+}
+
+# render table containing variable name and link to BETYdb variable page
+render_variable_table <- function(subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('variable_table_', id_str) ]] <- renderText({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    req(input[[ paste0('selected_cultivar_', id_str) ]])
+    
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
+    
+    variable_name <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'name' ]]
+    variable_id <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'id' ]]
+    description <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'description' ]]
+    
+    
+    variable_df <- data.frame('variable' = text_spec(variable_name,
+                                                 link = paste0("https://terraref.ncsa.illinois.edu/bety/variables/",
+                                                               variable_id)),
+                              'description' = description)
+    
+    variable_kable <- kable(variable_df,
+                            format = 'html',
+                            escape = FALSE, 
+                            padding=-1L) %>% 
+      kable_styling(bootstrap_options = 'hover', font_size = 12)
+    
+#    variable_kable_updated <- column_spec(variable_kable,
+#                                          column = 1,
+#                                          width = '10cm')
+    
+  })
+  
+}
+
+# render table containing method name and link to BETYdb method page
+render_method_table <- function(subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('method_table_', id_str) ]] <- renderText({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    req(input[[ paste0('selected_cultivar_', id_str) ]])
+    
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    selected_cultivar <- input[[ paste0('selected_cultivar_', id_str) ]]
+    
+    traits <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    
+    methods <- traits %>%
+      distinct(method, method_id, method_description) %>%
+      mutate(bety_link = paste0("https://terraref.ncsa.illinois.edu/bety/methods/",
+                                method_id))
+    
+    method_df <- data.frame('method' = text_spec(methods$method,
+                                               link = methods$bety_link),
+                            'description' = methods$method_description)
+    
+    method_kable <- kable(method_df,
+                          format = 'html',
+                          escape = FALSE) %>% 
+      kable_styling(bootstrap_options = 'hover', font_size = 12)
+    
+#    method_kable_updated <- column_spec(method_kable)
+    
+  })
+  
 }
 
 # render info box for date, type, and notes of selected (clicked) timeline item
@@ -464,6 +548,10 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
   
   render_rep_plot(subexp_name, id_str, input, output, full_cache_data)
+  
+  render_variable_table(subexp_name, id_str, input, output, full_cache_data)  
+  
+  render_method_table(subexp_name, id_str, input, output, full_cache_data)
   
   if (!is.null(full_cache_data[[ subexp_name ]][[ 'managements' ]])) {
     
