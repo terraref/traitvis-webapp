@@ -8,6 +8,7 @@ library(shinythemes)
 library(scales)
 library(stringr)
 library(kableExtra)
+library(heritability)
 
 source('render-site-map.R')
 
@@ -76,6 +77,7 @@ render_subexp_ui <- function(subexp_name, exp_name) {
                         hover = hoverOpts(id = paste0('plot_hover_', id_str)))
           ),
           hr(),
+          plotOutput(paste0('rep_plot_', id_str)),
           htmlOutput(paste0('variable_table_', id_str)),
           htmlOutput(paste0('method_table_', id_str)),
           hr(),
@@ -211,6 +213,45 @@ specific ndata points.\n'),
       xlim(as.Date(selected_subexp_data[[ 'start_date' ]]), as.Date(selected_subexp_data[[ 'end_date' ]])) +
       ylim(0, data_max)
   })
+}
+
+# render repeatibility plot for a given subexperiment
+render_rep_plot <- function(subexp_name, id_str, input, output, full_cache_data){
+  
+  output[[ paste0('rep_plot_', id_str) ]] <- renderPlot({
+    
+    req(input[[ paste0('selected_variable_', id_str) ]])
+    selected_variable <- input[[ paste0('selected_variable_', id_str) ]]
+    
+    selected_subexp_data <- full_cache_data[[ subexp_name ]]
+    trait_data <-  selected_subexp_data[[ 'trait_data' ]][[ selected_variable ]][[ 'traits' ]]
+    trait_data$date <- as.Date(trait_data$date)
+    rep_data <- data.frame()
+    
+    for(sel_date in as.list(unique(trait_data$date))){
+      date_subset <- trait_data[trait_data$date == sel_date,]
+      rep <- repeatability(data.vector = date_subset$mean,
+                           geno.vector = date_subset$cultivar_name)
+      new_row <- data.frame(date = sel_date, repeatability = rep$repeatability)
+      rep_data <- rbind(rep_data, new_row)
+    }
+    
+    rep_plot <- ggplot(data = rep_data, aes(x = date, y = repeatability)) +
+      geom_point(size = 1.0) + 
+      geom_line(size = 0.5, alpha = 0.5, color = 'red')
+    
+    rep_plot + 
+      labs(
+        title = 'Within season heritability',
+        x = "Date",
+        y = "Repeatibility"
+      ) +
+      theme_bw() + 
+      theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1)) + 
+      xlim(as.Date(selected_subexp_data[[ 'start_date' ]]), as.Date(selected_subexp_data[[ 'end_date' ]]))
+    
+  })
+  
 }
 
 # render timeline from management records in a given subexperiment
@@ -506,7 +547,9 @@ render_subexp_output <- function(subexp_name, exp_name, input, output, full_cach
   
   render_plot_hover(subexp_name, id_str, input, output, full_cache_data)
   
-  render_variable_table(subexp_name, id_str, input, output, full_cache_data)
+  render_rep_plot(subexp_name, id_str, input, output, full_cache_data)
+  
+  render_variable_table(subexp_name, id_str, input, output, full_cache_data)  
   
   render_method_table(subexp_name, id_str, input, output, full_cache_data)
   
