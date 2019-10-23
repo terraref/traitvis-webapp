@@ -10,6 +10,15 @@ You will also need to create a globus account at [globus.org](https://www.globus
 
 More detailed information on required R packages, image thumbnails, how to set up a database connection, and how to get the shiny application running is described in the following sections.
 
+### Clone the repository
+
+Clone the [terraref/traitvis](https://github.com/terraref/traitvis-webapp) repository:
+
+```sh
+git clone https://github.com/terraref/traitvis-webapp.git
+cd traitvis-webapp
+```
+
 ### Database connection
 
 This application requires a connection to a BETYdb database. It requires a BETYdb database that uses the experiments table to associate time ranges and sites or plots with specific experiments or seasons.
@@ -19,6 +28,7 @@ A connection to a local instance of BETYdb can be created by running the followi
 ```sh
 docker-compose -p bety up  -d postgres
 
+# ignore lots of errors in the following step
 docker run -ti --rm --network bety_bety -e BETY_INITIALIZE_URL='-w https://terraref.ncsa.illinois.edu/bety/dump/bety0/bety.tar.gz' pecan/bety:develop initialize
 
 docker run -ti --rm --network bety_bety -e REMOTE_SERVERS=6  pecan/bety:terra sync
@@ -36,18 +46,15 @@ install.packages(c('shiny', 'shinythemes', 'scales', 'lubridate', 'dplyr', 'ggpl
 
 ### Download image thumbnails
 
-Fullfield image thumbnails are available to be displayed under heatmaps. These thumbnails can be downloaded from the `/ua-mac/Level_2/rgb_fullfield/_thumbs/` endpoint on [Globus](https://www.globus.org/).
+Fullfield image thumbnails are available to be displayed under heatmaps. These thumbnails can be downloaded from the TERRAREF endpoint on [Globus](https://www.globus.org/), which you will need permission to access. If you have not already done so:
 
-These thumbs should be saved to the following path in your home directory `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
+1. sign up for terraref.org/beta 
+2. send your globus user email to dlebauer@arizona.edu.
+3. install the [Globus connect personal](https://www.globus.org/globus-connect-personal) application and register your computer.
+
+Then transfer the directory  `/ua-mac/Level_2/rgb_fullfield/_thumbs/` to the following path in your home directory: `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
 
 ### How to run Shiny Application
-
-Clone the [terraref/traitvis](https://github.com/terraref/traitvis-webapp) repository:
-
-```sh
-git clone https://github.com/terraref/traitvis-webapp.git
-cd traitvis-webapp
-```
 
 The `cache-refresh.R` script needs to be run and requires a database connection. To connect to the local instance of BETYdb that you set up above, you will need to set the following connection parameters as environment variables.
 
