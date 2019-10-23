@@ -60,7 +60,7 @@ The `cache-refresh.R` script needs to be run and requires a database connection.
 
 In your R console, run the following commands:
 
-```sh
+```r
 Sys.setenv(bety_host = 'localhost')
 Sys.setenv(bety_port = '5433')
 source('cache-refresh.R')
@@ -70,7 +70,7 @@ Running the cache-refresh script should create a `cache` folder containing a `ca
 
 Next, start up the application by running:
 
-```sh
+```r
 shiny::runAPP()
 ```
 
