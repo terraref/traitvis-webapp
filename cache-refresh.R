@@ -154,10 +154,10 @@ get_data_for_exp <- function(exp_name, experiments) {
 # get all experiments in BETYdb
 experiments <- tbl(bety_src, 'experiments') %>% 
   dplyr::select(id, name, start_date, end_date) %>% 
-  dplyr::filter(!grepl('KSU', name)) %>% 
-  collect() %>% as.data.frame()
+  collect() %>% 
+  as.data.frame()
 
-exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
+exp_names <- as.factor(sort(unique(gsub(":.*$","", experiments[[ 'name' ]]))))
 lapply(exp_names, get_data_for_exp, experiments)
 file.rename(cache_path_temp, cache_path)
 #file.copy(cache_path_temp, cache_path)

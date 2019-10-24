@@ -238,7 +238,8 @@ render_rep_plot <- function(subexp_name, id_str, input, output, full_cache_data)
     
     rep_plot <- ggplot(data = rep_data, aes(x = date, y = repeatability)) +
       geom_point(size = 1.0) + 
-      geom_line(size = 0.5, alpha = 0.5, color = 'red')
+      geom_line(size = 0.5, alpha = 0.5, color = 'red') +
+      ylim(c(0,1))
     
     rep_plot + 
       labs(
