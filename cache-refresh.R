@@ -158,7 +158,7 @@ experiments <- tbl(bety_src, 'experiments') %>%
   collect() %>% as.data.frame()
 
 exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
-lapply(exp_names[c(5, 8)], get_data_for_exp, experiments)
+lapply(exp_names, get_data_for_exp, experiments)
 file.rename(cache_path_temp, cache_path)
 #file.copy(cache_path_temp, cache_path)
 message("Completed cache refresh properly.")
