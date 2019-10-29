@@ -33,7 +33,8 @@ RUN install2.r --error \
          heritability \
       && rm -rf /srv/shiny-server/sample-apps
 
-RUN apt-get install -y \
+RUN apt-get update \
+    && apt-get install -y \
         libudunits2-dev \
         libgdal-dev \
         gdal-bin \
