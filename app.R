@@ -116,7 +116,8 @@ render_experiment_ui <- function(exp_name, full_cache_data) {
 # render selection menu from available variables in a given subexperiment
 render_variable_menu <- function(subexp_name, id_str, output, full_cache_data) {
   
-  variable_names <- names(full_cache_data[[ subexp_name ]][[ 'trait_data' ]])
+  # sort dropdown menu of variable names alphabetically 
+  variable_names <- sort(names(full_cache_data[[ subexp_name ]][[ 'trait_data' ]]))
   
   output[[ paste0('variable_select_', id_str) ]] <- renderUI({
     selectInput(paste0('selected_variable_', id_str), 'Variable', variable_names)
@@ -131,7 +132,8 @@ render_cultivar_menu <- function(subexp_name, id_str, input, output, full_cache_
     req(input[[ paste0('selected_variable_', id_str) ]])
     
     trait_records <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ input[[ paste0('selected_variable_', id_str) ]] ]][[ 'traits' ]]
-    unique_cultivars <- unique(trait_records[[ 'cultivar_name' ]])
+    # sort dropdown menu of cultivar names alphabetically, starting with "None"
+    unique_cultivars <- sort(unique(trait_records[[ 'cultivar_name' ]]))
     
     selectInput(paste0('selected_cultivar_', id_str), 'Cultivar', c('None', unique_cultivars))
   })
