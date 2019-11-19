@@ -57,7 +57,7 @@ ui <- fluidPage(theme = shinytheme('flatly'),
 # render UI for a given subexperiment
 render_subexp_ui <- function(subexp_name, exp_name) {
   
-  id_str <- paste0(exp_name, '_', subexp_name)
+  id_str <- sort(paste0(exp_name, '_', subexp_name))
   
   tabPanel(subexp_name,
     
@@ -185,7 +185,8 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
           geom_point(data = subset(plot_data, cultivar_name == selected_cultivar), 
                      aes(x = as.Date(date), y = mean, group = site_id)) +
           geom_line(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                     size = 0.5, alpha = 0.5, aes(x = as.Date(date), y = mean, group = site_id)) 
+                     size = 0.5, alpha = 0.5, color = 'black', aes(x = as.Date(date), 
+                                                                 y = mean, group = site_id)) 
     } else {
         title <- selected_variable
     }
