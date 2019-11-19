@@ -183,12 +183,12 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
       }
       
     if (selected_cultivar != 'None') {
-        title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in black')
+        title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in red')
         trait_plot <- trait_plot + 
           geom_point(data = subset(plot_data, cultivar_name == selected_cultivar),
-                     color = 'black', aes(x = as.Date(date), y = mean, group = site_id)) +
+                     color = 'red', aes(x = as.Date(date), y = mean, group = site_id)) +
           geom_line(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                     size = 0.5, alpha = 0.5, color = 'black', aes(x = as.Date(date), 
+                     size = 0.5, alpha = 0.5, color = 'red', aes(x = as.Date(date), 
                                                                  y = mean, group = site_id)) 
     } else {
         title <- selected_variable
@@ -206,7 +206,7 @@ represents the median. The whiskers of the box extend from the lower (Q1) or
 upper (Q3) quartile to the minimum or maximum data point that is not considered
 an outlier.  Outliers are data points that are either less than Q1 - 1.5*IQR or
 greater than Q3 + 1.5*IQR. Outliers are the points that lie above or below the
-whiskers. If a cultivar is selected, a black line will connect the cultivar
+whiskers. If a cultivar is selected, a red line will connect the cultivar
 specific ndata points.\n'),
         x = "Date",
         y = units
