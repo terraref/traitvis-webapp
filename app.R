@@ -182,8 +182,8 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
     if (selected_cultivar != 'None') {
         title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in red')
         trait_plot <- trait_plot + 
-          geom_point(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                     aes(x = as.Date(date), y = mean, group = site_id)) +
+          geom_point(data = subset(plot_data, cultivar_name == selected_cultivar),
+                     color = 'black', aes(x = as.Date(date), y = mean, group = site_id)) +
           geom_line(data = subset(plot_data, cultivar_name == selected_cultivar), 
                      size = 0.5, alpha = 0.5, color = 'black', aes(x = as.Date(date), 
                                                                  y = mean, group = site_id)) 
