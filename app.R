@@ -26,6 +26,9 @@ load_cache <- function(full_cache_data) {
         load(cache_path)
         # TODO: See if it works if we omit this line
         # full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", "MAC Season 1", "MAC Season 2", "MAC Season 3", "MAC Season 4", "MAC Season 6")]
+        
+        # Sort the tabs alphabetically / numerically 
+        full_cache_data <- full_cache_data[sort(names(full_cache_data))]
         cache_mod_time <- curr_mod_time
         cat(file=stderr(), "Loading cache.RData file completed.", "\n")
         return(full_cache_data)
@@ -180,7 +183,7 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
       }
       
     if (selected_cultivar != 'None') {
-        title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in red')
+        title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in black')
         trait_plot <- trait_plot + 
           geom_point(data = subset(plot_data, cultivar_name == selected_cultivar),
                      color = 'black', aes(x = as.Date(date), y = mean, group = site_id)) +
@@ -203,7 +206,7 @@ represents the median. The whiskers of the box extend from the lower (Q1) or
 upper (Q3) quartile to the minimum or maximum data point that is not considered
 an outlier.  Outliers are data points that are either less than Q1 - 1.5*IQR or
 greater than Q3 + 1.5*IQR. Outliers are the points that lie above or below the
-whiskers. If a cultivar is selected, a red line will connect the cultivar
+whiskers. If a cultivar is selected, a black line will connect the cultivar
 specific ndata points.\n'),
         x = "Date",
         y = units
