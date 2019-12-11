@@ -26,6 +26,9 @@ load_cache <- function(full_cache_data) {
         load(cache_path)
         # TODO: See if it works if we omit this line
         # full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", "MAC Season 1", "MAC Season 2", "MAC Season 3", "MAC Season 4", "MAC Season 6")]
+        
+        # Sort the tabs alphabetically / numerically 
+        full_cache_data <- full_cache_data[sort(names(full_cache_data))]
         cache_mod_time <- curr_mod_time
         cat(file=stderr(), "Loading cache.RData file completed.", "\n")
         return(full_cache_data)
@@ -57,7 +60,7 @@ ui <- fluidPage(theme = shinytheme('flatly'),
 # render UI for a given subexperiment
 render_subexp_ui <- function(subexp_name, exp_name) {
   
-  id_str <- paste0(exp_name, '_', subexp_name)
+  id_str <- sort(paste0(exp_name, '_', subexp_name))
   
   tabPanel(subexp_name,
     
@@ -116,7 +119,8 @@ render_experiment_ui <- function(exp_name, full_cache_data) {
 # render selection menu from available variables in a given subexperiment
 render_variable_menu <- function(subexp_name, id_str, output, full_cache_data) {
   
-  variable_names <- names(full_cache_data[[ subexp_name ]][[ 'trait_data' ]])
+  # sort dropdown menu of variable names alphabetically 
+  variable_names <- sort(names(full_cache_data[[ subexp_name ]][[ 'trait_data' ]]))
   
   output[[ paste0('variable_select_', id_str) ]] <- renderUI({
     selectInput(paste0('selected_variable_', id_str), 'Variable', variable_names)
@@ -131,7 +135,8 @@ render_cultivar_menu <- function(subexp_name, id_str, input, output, full_cache_
     req(input[[ paste0('selected_variable_', id_str) ]])
     
     trait_records <- full_cache_data[[ subexp_name ]][[ 'trait_data' ]][[ input[[ paste0('selected_variable_', id_str) ]] ]][[ 'traits' ]]
-    unique_cultivars <- unique(trait_records[[ 'cultivar_name' ]])
+    # sort dropdown menu of cultivar names alphabetically, starting with "None"
+    unique_cultivars <- sort(unique(trait_records[[ 'cultivar_name' ]]))
     
     selectInput(paste0('selected_cultivar_', id_str), 'Cultivar', c('None', unique_cultivars))
   })
@@ -180,10 +185,11 @@ render_trait_plot <- function(subexp_name, id_str, input, output, full_cache_dat
     if (selected_cultivar != 'None') {
         title <- paste0(selected_variable, '\nCultivar ', selected_cultivar, ' in red')
         trait_plot <- trait_plot + 
-          geom_point(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                     aes(x = as.Date(date), y = mean, group = site_id)) +
+          geom_point(data = subset(plot_data, cultivar_name == selected_cultivar),
+                     color = 'red', aes(x = as.Date(date), y = mean, group = site_id)) +
           geom_line(data = subset(plot_data, cultivar_name == selected_cultivar), 
-                     size = 0.5, alpha = 0.5, aes(x = as.Date(date), y = mean, group = site_id)) 
+                     size = 0.5, alpha = 0.5, color = 'red', aes(x = as.Date(date), 
+                                                                 y = mean, group = site_id)) 
     } else {
         title <- selected_variable
     }
