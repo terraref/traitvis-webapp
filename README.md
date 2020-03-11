@@ -46,13 +46,16 @@ install.packages(c('shiny', 'shinythemes', 'scales', 'lubridate', 'dplyr', 'ggpl
 
 ### Download image thumbnails
 
-Fullfield image thumbnails are available to be displayed under heatmaps. These thumbnails can be downloaded from the TERRAREF endpoint on [Globus](https://www.globus.org/), which you will need permission to access. If you have not already done so:
+Fullfield image thumbnails are available to be displayed under heatmaps.
+These thumbnails can be downloaded from the TERRAREF endpoint on [Globus](https://www.globus.org/), which you will need permission to access. If you have not already done so:
 
-1. sign up for terraref.org/beta 
 2. send your globus user email to dlebauer@arizona.edu.
 3. install the [Globus connect personal](https://www.globus.org/globus-connect-personal) application and register your computer.
+4. Request access
 
-Then transfer the directory  `/ua-mac/Level_2/rgb_fullfield/_thumbs/` to the following path in your home directory: `~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs`.
+The total size of the thumbnails is 2.3GB
+
+Then transfer the directory  `/ua-mac/Level_2/rgb_fullfield/_thumbs/` to the following path: `rgb_fullfield/_thumbs`. This location can be changed on in the file [render-site-map.R].
 
 ### How to run Shiny Application
 
