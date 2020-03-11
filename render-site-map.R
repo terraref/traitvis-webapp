@@ -25,7 +25,7 @@ render_site_map <- function(selected_variable, traits, render_date, legend_title
                                 '</p><p>',
                                 selected_variable, 
                                 ': ',
-                                mean,
+                                signif(mean, 3),
                                 '</p>'))
 
   pal <- colorNumeric(

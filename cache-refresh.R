@@ -157,7 +157,12 @@ experiments <- tbl(bety_src, 'experiments') %>%
   collect() %>% 
   as.data.frame()
 
-exp_names <- unique(gsub(":.*$","", experiments[[ 'name' ]]))
+exp_names <- experiments %>% 
+  filter(grepl("Season 4|Season 6|Season 9", name)) %>% 
+  mutate(name = gsub(":.*$","", name)) %>% 
+  select(name) %>% 
+  unique() %>% unlist()
+
 lapply(exp_names, get_data_for_exp, experiments)
 file.rename(cache_path_temp, cache_path)
 #file.copy(cache_path_temp, cache_path)
