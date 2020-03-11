@@ -26,6 +26,8 @@ load_cache <- function(full_cache_data) {
         load(cache_path)
         # TODO: See if it works if we omit this line
         # full_cache_data <- full_cache_data[c("Danforth Sorghum Pilot", "KSU 2016", "MAC Season 1", "MAC Season 2", "MAC Season 3", "MAC Season 4", "MAC Season 6")]
+        full_cache_data <- full_cache_data[sort(names(full_cache_data))]
+        full_cache_data <- full_cache_data[c("MAC Season 4", "MAC Season 6", "MAC Season 9")]
         
         # Sort the tabs alphabetically / numerically 
         full_cache_data <- full_cache_data[sort(names(full_cache_data))]
