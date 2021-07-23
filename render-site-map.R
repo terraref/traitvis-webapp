@@ -9,13 +9,13 @@ library(leafem)
 # render leaflet map from traits for a given date
 # overlay fullfield image if thumb avaiable for selected date
 render_site_map <- function(selected_variable, traits, render_date, legend_title, overlay_image = 0) {
-  
+
   # get most recent traits for each site
   # convert each site's geometry to a sfc object # will coerce polygons into multipolygon
-  latest_traits <- subset(traits, as.Date(date) <= render_date & !is.na(geometry)) %>% 
-    mutate(site_poly = st_as_sfc(geometry)) %>% 
-    group_by(geometry) %>% 
-    top_n(1, date) %>% 
+  latest_traits <- subset(traits, as.Date(date) <= render_date & !is.na(geometry)) %>%
+    mutate(site_poly = st_as_sfc(geometry)) %>%
+    group_by(geometry) %>%
+    top_n(1, date) %>%
     mutate(hover_label = paste0('<p>Cultivar: ',
                                 cultivar_name,
                                 '</p><p>Plot: ',
@@ -23,7 +23,7 @@ render_site_map <- function(selected_variable, traits, render_date, legend_title
                                      '',
                                      sitename),
                                 '</p><p>',
-                                selected_variable, 
+                                selected_variable,
                                 ': ',
                                 signif(mean, 3),
                                 '</p>'))
@@ -32,10 +32,10 @@ render_site_map <- function(selected_variable, traits, render_date, legend_title
     palette = 'Greens',
     domain = traits[[ 'mean' ]]
   )
-  
+
   map <- leaflet(options = leafletOptions(minZoom = 18, maxZoom = 21))  %>%
-    addProviderTiles(providers$Esri.WorldImagery) 
-  
+    addProviderTiles(providers$Esri.WorldImagery)
+
   if(nrow(latest_traits) > 0){
     # color sites by trait mean value
     # coerce site polygons to multipolygon
@@ -47,37 +47,37 @@ render_site_map <- function(selected_variable, traits, render_date, legend_title
                        fillOpacity = 0.8,
                        group = 'Heat map',
                        label = lapply(latest_traits[[ 'hover_label' ]], HTML))
-    
+
     map <- addLayersControl(map,
                             overlayGroups = "Heat map",
                             position = "topleft")
-    
+
     map <- addLegend(map,
-                     "bottomright", 
-                     pal = pal, 
+                     "bottomright",
+                     pal = pal,
                      title = legend_title,
                      values = traits[[ 'mean' ]])
-    
-    if(overlay_image == 1){ 
-      
-      image_dir <- '~/data/terraref/sites/ua-mac/Level_2/rgb_fullfield/_thumbs'
+
+    if(overlay_image == 1){
+
+      image_dir <- 'rgb_fullfield/_thumbs'
       image_paths <- list.files(image_dir, pattern = as.character(render_date))
       full_image_paths <- file.path(image_dir, image_paths)
-      
+
       for(path in full_image_paths){
         scan_number <- which(full_image_paths == path)
         scan_name <- paste0('scan ', scan_number)
         fullfield_image <- brick(path)
-        map <- viewRGB(x = fullfield_image, 
+        map <- viewRGB(x = fullfield_image,
                        r = 1, g = 2, b = 3,
-                       quantiles = NULL, 
-                       map = map, 
+                       quantiles = NULL,
+                       map = map,
                        layer.name = scan_name)
         map <- removeHomeButton(map@map)
       }
     }
   }
-  
+
   map
 
 }
