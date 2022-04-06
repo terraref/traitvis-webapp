@@ -549,6 +549,7 @@ render_download_info <- function(exp_name, subexp_name, id_str, input, output, f
                                 text_7, text_8, text_9,
                                 text_10, text_11, text_12,
                                 text_13, text_14, text_15))
+    download_text <- HTML("Data can be downloaded from the data publication on Dryad, <a href='https://datadryad.org/stash/dataset/doi:10.5061/dryad.4b8gtht99'>LeBauer et al 2020</a>. Trait data are in the trait_data.zip file.
   })
 
 }
